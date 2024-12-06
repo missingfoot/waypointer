@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { WaypointItem } from './WaypointItem';
 import { MapPin } from 'lucide-react';
+import { WaypointsSortControls } from './waypoints/WaypointsSortControls';
 
 interface Waypoint {
   id: string;
@@ -21,22 +22,46 @@ interface WaypointsListProps {
   onWaypointDelete: (id: string) => void;
 }
 
+type SortOption = 'alphabetical' | 'time';
+type SortDirection = 'asc' | 'desc';
+
 export const WaypointsList: React.FC<WaypointsListProps> = ({
   waypoints,
   categories,
   onWaypointDelete,
 }) => {
   const [filterText, setFilterText] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('time');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const getCategoryColor = (categoryName: string) => {
     const category = categories.find(cat => cat.name === categoryName);
     return category?.color || '#9b87f5';
   };
 
+  const handleSortClick = (newSortBy: SortOption) => {
+    if (sortBy === newSortBy) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(newSortBy);
+      setSortDirection('asc');
+    }
+  };
+
   const filteredWaypoints = waypoints.filter(waypoint =>
     waypoint.name.toLowerCase().includes(filterText.toLowerCase()) ||
     waypoint.category.toLowerCase().includes(filterText.toLowerCase())
   );
+
+  const sortedWaypoints = [...filteredWaypoints].sort((a, b) => {
+    if (sortBy === 'alphabetical') {
+      const comparison = a.name.localeCompare(b.name);
+      return sortDirection === 'asc' ? comparison : -comparison;
+    } else {
+      const comparison = a.id.localeCompare(b.id);
+      return sortDirection === 'asc' ? comparison : -comparison;
+    }
+  });
 
   if (waypoints.length === 0) {
     return (
@@ -59,16 +84,25 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
           className="h-8"
         />
       </div>
-      {filteredWaypoints.map((waypoint) => (
-        <WaypointItem
-          key={waypoint.id}
-          id={waypoint.id}
-          name={waypoint.name}
-          category={waypoint.category}
-          categoryColor={getCategoryColor(waypoint.category)}
-          onDelete={onWaypointDelete}
+      <div className="flex justify-start items-center mb-2 -mx-3">
+        <WaypointsSortControls
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          onSortChange={handleSortClick}
         />
-      ))}
+      </div>
+      <div className="space-y-2">
+        {sortedWaypoints.map((waypoint) => (
+          <WaypointItem
+            key={waypoint.id}
+            id={waypoint.id}
+            name={waypoint.name}
+            category={waypoint.category}
+            categoryColor={getCategoryColor(waypoint.category)}
+            onDelete={onWaypointDelete}
+          />
+        ))}
+      </div>
     </div>
   );
 };
