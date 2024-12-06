@@ -8,12 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface Category {
   id: string;
@@ -81,53 +75,37 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
   return (
     <>
       <div className="flex justify-between items-center mb-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem onClick={() => handleSortClick('alphabetical')}>
-                    {`Sort Alphabetically ${sortBy === 'alphabetical' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}`}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSortClick('time')}>
-                    {`Sort by Time Added ${sortBy === 'time' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}`}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TooltipTrigger>
-            <TooltipContent>
-              Sort Categories
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8"
+            >
+              <ArrowUpDown className="h-4 w-4 mr-1" />
+              Sort
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => handleSortClick('alphabetical')}>
+              {`Sort Alphabetically ${sortBy === 'alphabetical' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}`}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleSortClick('time')}>
+              {`Sort by Time Added ${sortBy === 'time' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}`}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                ref={addButtonRef}
-                size="icon"
-                variant="ghost"
-                onClick={onAddClick}
-                className="h-8 w-8"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              Add Category
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Button
+          ref={addButtonRef}
+          size="sm"
+          variant="ghost"
+          onClick={onAddClick}
+          className="h-8"
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          Add
+        </Button>
       </div>
       <div className="space-y-2">
         {sortedCategories.map((category) => (
