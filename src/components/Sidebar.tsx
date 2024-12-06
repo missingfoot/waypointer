@@ -81,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className="flex items-center justify-between p-2 rounded-md bg-muted relative"
               >
                 <div
-                  className="absolute inset-y-2 left-2 w-6 rounded-md"
+                  className="absolute inset-y-2 left-2 w-1.5 rounded-[9999px]"
                   style={{ backgroundColor: getCategoryColor(waypoint.category) }}
                 />
                 <div className="flex items-center gap-2 pl-8">
@@ -121,7 +121,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className="flex items-center justify-between p-2 rounded-md bg-muted relative"
               >
                 <div
-                  className="absolute inset-y-2 left-2 w-6 rounded-md"
+                  className="absolute inset-y-2 left-2 w-1.5 rounded-[9999px]"
                   style={{ backgroundColor: category.color }}
                 />
                 <div className="flex items-center gap-2 pl-8">
