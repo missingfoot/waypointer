@@ -18,6 +18,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
       className="absolute bottom-4 right-4 flex flex-col gap-0.5 bg-background rounded-lg shadow-lg border border-border overflow-hidden"
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
+      onDoubleClick={(e) => e.stopPropagation()}
     >
       <Button
         variant="ghost"
