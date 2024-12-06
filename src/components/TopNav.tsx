@@ -1,12 +1,16 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin, Move, Home, ChevronDown, Sun, Moon } from 'lucide-react';
+import { MapPin, Move, Home, ChevronDown, Sun, Moon, Laptop } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 
 interface TopNavProps {
@@ -92,17 +96,32 @@ export const TopNav: React.FC<TopNavProps> = ({
             <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
               Account Settings
             </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="py-3 px-4 text-sm cursor-pointer flex items-center justify-between"
-              onClick={onToggleTheme}
-            >
-              Theme
-              {theme === 'dark' ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="py-3 px-4 text-sm cursor-pointer">
+                <span>Theme</span>
+                {theme === 'dark' ? (
+                  <Moon className="h-4 w-4 ml-2" />
+                ) : (
+                  <Sun className="h-4 w-4 ml-2" />
+                )}
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
+                    <Sun className="h-4 w-4 mr-2" />
+                    Light
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
+                    <Moon className="h-4 w-4 mr-2" />
+                    Dark
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
+                    <Laptop className="h-4 w-4 mr-2" />
+                    System
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer text-red-500">
               Sign Out
