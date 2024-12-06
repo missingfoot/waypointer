@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { MapUploadInterface } from './map/MapUploadInterface';
 import { MapContent } from './map/MapContent';
@@ -26,6 +26,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   isAddingWaypoint,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [hasMouseMoved, setHasMouseMoved] = useState(false);
+  const [mouseStartPosition, setMouseStartPosition] = useState({ x: 0, y: 0 });
+  
   const {
     scale,
     position,
@@ -49,8 +52,27 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     }
   };
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isAddingWaypoint || !mapUrl || isDragging) return;
+  const handleMapMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setHasMouseMoved(false);
+    setMouseStartPosition({ x: e.clientX, y: e.clientY });
+    handleMouseDown(e);
+  };
+
+  const handleMapMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const deltaX = Math.abs(e.clientX - mouseStartPosition.x);
+    const deltaY = Math.abs(e.clientY - mouseStartPosition.y);
+    
+    // Consider it a move if the mouse has moved more than 5 pixels in any direction
+    if (deltaX > 5 || deltaY > 5) {
+      setHasMouseMoved(true);
+    }
+    handleMouseMove(e);
+  };
+
+  const handleMapMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+    handleMouseUp();
+    
+    if (!isAddingWaypoint || !mapUrl || isDragging || hasMouseMoved) return;
 
     const rect = mapContainerRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -82,10 +104,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
         } ${
           isAddingWaypoint ? 'cursor-crosshair' : 'cursor-grab'
         } ${isDragging ? 'cursor-grabbing' : ''}`}
-        onClick={handleClick}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
+        onMouseDown={handleMapMouseDown}
+        onMouseMove={handleMapMouseMove}
+        onMouseUp={handleMapMouseUp}
         onMouseLeave={handleMouseUp}
       >
         {!mapUrl ? (
