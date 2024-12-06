@@ -77,7 +77,7 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
             type="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}
-            className="h-8 w-8 p-0 cursor-pointer"
+            className="h-8 w-8 p-0 cursor-pointer [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:border-none"
           />
           <Input
             type="text"
