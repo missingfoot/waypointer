@@ -24,23 +24,35 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
 }) => {
   return (
     <>
-      <div className="flex justify-end">
-        <Button
-          ref={addButtonRef}
-          size="icon"
-          variant="ghost"
-          onClick={onAddClick}
-          className="h-8 w-8"
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
+      {categories.length > 0 && (
+        <div className="flex justify-end">
+          <Button
+            ref={addButtonRef}
+            size="icon"
+            variant="ghost"
+            onClick={onAddClick}
+            className="h-8 w-8"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+      
       {categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[200px] text-center space-y-4 text-muted-foreground">
           <ListChecks className="w-8 h-8" />
           <p>
             Set up categories to organize your waypoints, or add them automatically as you create new waypoints
           </p>
+          <Button
+            ref={addButtonRef}
+            onClick={onAddClick}
+            variant="outline"
+            className="mt-4"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Category
+          </Button>
         </div>
       ) : (
         <div className="space-y-2">
