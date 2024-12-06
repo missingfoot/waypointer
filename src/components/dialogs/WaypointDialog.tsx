@@ -57,43 +57,38 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
       }}
     >
       <form onSubmit={handleSubmit} className="p-3 space-y-2">
-        <div className="space-y-1">
-          <Label htmlFor="name" className="text-xs">Name</Label>
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Description"
+          className="h-8 text-sm"
+          autoComplete="off"
+        />
+        <div className="relative">
           <Input
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Waypoint name"
+            value={category}
+            onChange={(e) => handleCategoryChange(e.target.value)}
+            onFocus={() => setShowSuggestions(true)}
+            placeholder="Type category"
             className="h-8 text-sm"
+            autoComplete="off"
           />
-        </div>
-        <div className="space-y-1">
-          <Label className="text-xs">Category</Label>
-          <div className="relative">
-            <Input
-              value={category}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-              onFocus={() => setShowSuggestions(true)}
-              placeholder="Type category"
-              className="h-8 text-sm"
-            />
-            {showSuggestions && categories.length > 0 && (
-              <div className="absolute w-full mt-1 bg-popover border rounded-md shadow-md z-50 max-h-[120px] overflow-y-auto">
-                {filteredCategories.map((cat) => (
-                  <div
-                    key={cat.id}
-                    className="px-2 py-1 text-sm hover:bg-accent cursor-pointer"
-                    onClick={() => {
-                      setCategory(cat.name);
-                      setShowSuggestions(false);
-                    }}
-                  >
-                    {cat.name}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {showSuggestions && categories.length > 0 && (
+            <div className="absolute w-full mt-1 bg-popover border rounded-md shadow-md z-50 max-h-[120px] overflow-y-auto">
+              {filteredCategories.map((cat) => (
+                <div
+                  key={cat.id}
+                  className="px-2 py-1 text-sm hover:bg-accent cursor-pointer"
+                  onClick={() => {
+                    setCategory(cat.name);
+                    setShowSuggestions(false);
+                  }}
+                >
+                  {cat.name}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex justify-end space-x-2 pt-1">
           <Button 
