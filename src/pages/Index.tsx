@@ -19,6 +19,20 @@ interface Category {
   color: string;
 }
 
+// Predefined colors for categories
+const categoryColors = [
+  '#9b87f5', // Primary Purple
+  '#F97316', // Bright Orange
+  '#0EA5E9', // Ocean Blue
+  '#D946EF', // Magenta Pink
+  '#33C3F0', // Sky Blue
+  '#FEC6A1', // Soft Orange
+  '#E5DEFF', // Soft Purple
+  '#D3E4FD', // Soft Blue
+  '#8B5CF6', // Vivid Purple
+  '#1EAEDB', // Bright Blue
+];
+
 const Index = () => {
   const [mapUrl, setMapUrl] = useState<string | null>(null);
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
@@ -43,7 +57,7 @@ const Index = () => {
     
     // If the category doesn't exist, add it with a default color
     if (!categories.some(cat => cat.name === point.category)) {
-      handleCategoryAdd(point.category, '#9b87f5');
+      handleCategoryAdd(point.category, categoryColors[categories.length % categoryColors.length]);
     }
     
     toast.success('Waypoint added successfully', {
@@ -69,10 +83,13 @@ const Index = () => {
       return;
     }
     
+    // Use the next color from our predefined colors array
+    const newColor = color || categoryColors[categories.length % categoryColors.length];
+    
     const newCategory: Category = {
       id: Math.random().toString(36).substr(2, 9),
       name: trimmedName,
-      color,
+      color: newColor,
     };
     setCategories(prevCategories => [...prevCategories, newCategory]);
     toast.success('Category added successfully', {
