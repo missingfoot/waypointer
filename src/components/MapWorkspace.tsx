@@ -28,6 +28,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [hasMouseMoved, setHasMouseMoved] = useState(false);
   const [mouseStartPosition, setMouseStartPosition] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
   
   const {
     scale,
@@ -62,9 +63,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     const deltaX = Math.abs(e.clientX - mouseStartPosition.x);
     const deltaY = Math.abs(e.clientY - mouseStartPosition.y);
     
-    // Consider it a move if the mouse has moved more than 15 pixels in any direction
-    if (deltaX > 15 || deltaY > 15) {
+    if (deltaX > 5 || deltaY > 5) {
       setHasMouseMoved(true);
+      setIsPanning(true);
     }
     handleMouseMove(e);
   };
@@ -72,7 +73,11 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   const handleMapMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
     handleMouseUp();
     
-    if (!isAddingWaypoint || !mapUrl || isDragging || hasMouseMoved) return;
+    if (!isAddingWaypoint || !mapUrl || hasMouseMoved) {
+      setIsPanning(false);
+      setHasMouseMoved(false);
+      return;
+    }
 
     const rect = mapContainerRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -89,6 +94,8 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     const boundedY = Math.max(0, Math.min(100, gridY));
 
     onWaypointAdd({ x: boundedX, y: boundedY });
+    setHasMouseMoved(false);
+    setIsPanning(false);
   };
 
   return (
@@ -102,12 +109,16 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
         className={`w-full h-full relative rounded-lg shadow-sm border border-border overflow-hidden select-none ${
           mapUrl ? 'bg-[repeating-linear-gradient(45deg,#fafad2,#fafad2_10px,#fff_10px,#fff_20px)]' : 'bg-white'
         } ${
-          isAddingWaypoint ? 'cursor-crosshair' : 'cursor-grab'
+          isAddingWaypoint && !isPanning ? 'cursor-crosshair' : 'cursor-grab'
         } ${isDragging ? 'cursor-grabbing' : ''}`}
         onMouseDown={handleMapMouseDown}
         onMouseMove={handleMapMouseMove}
         onMouseUp={handleMapMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseLeave={() => {
+          handleMouseUp();
+          setIsPanning(false);
+          setHasMouseMoved(false);
+        }}
       >
         {!mapUrl ? (
           <MapUploadInterface onMapUpload={onMapUpload} />
