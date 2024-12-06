@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { WaypointItem } from './WaypointItem';
-import { MapPin } from 'lucide-react';
+import { MapPin, Group } from 'lucide-react';
 import { WaypointsSortControls } from './waypoints/WaypointsSortControls';
+import { Button } from '@/components/ui/button';
 
 interface Waypoint {
   id: string;
@@ -33,6 +34,7 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
   const [filterText, setFilterText] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [groupByCategory, setGroupByCategory] = useState(false);
 
   const getCategoryColor = (categoryName: string) => {
     const category = categories.find(cat => cat.name === categoryName);
@@ -63,6 +65,22 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
     }
   });
 
+  const groupedWaypoints = groupByCategory
+    ? categories.reduce((acc, category) => {
+        const categoryWaypoints = sortedWaypoints.filter(
+          wp => wp.category === category.name
+        );
+        if (categoryWaypoints.length > 0) {
+          acc.push({
+            category: category.name,
+            color: category.color,
+            waypoints: categoryWaypoints,
+          });
+        }
+        return acc;
+      }, [] as Array<{ category: string; color: string; waypoints: Waypoint[] }>)
+    : null;
+
   if (waypoints.length === 0) {
     return (
       <div className="flex flex-col items-start pt-8 space-y-4 text-left">
@@ -84,24 +102,56 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
           className="h-8"
         />
       </div>
-      <div className="flex justify-start items-center mb-2 -mx-3">
+      <div className="flex justify-between items-center mb-2 -mx-3">
         <WaypointsSortControls
           sortBy={sortBy}
           sortDirection={sortDirection}
           onSortChange={handleSortClick}
         />
+        <Button
+          size="sm"
+          variant={groupByCategory ? "secondary" : "ghost"}
+          onClick={() => setGroupByCategory(!groupByCategory)}
+          className="h-8 px-3"
+        >
+          <Group className="h-4 w-4 mr-1" />
+          Group
+        </Button>
       </div>
-      <div className="space-y-2">
-        {sortedWaypoints.map((waypoint) => (
-          <WaypointItem
-            key={waypoint.id}
-            id={waypoint.id}
-            name={waypoint.name}
-            category={waypoint.category}
-            categoryColor={getCategoryColor(waypoint.category)}
-            onDelete={onWaypointDelete}
-          />
-        ))}
+      <div className="space-y-4">
+        {groupByCategory && groupedWaypoints ? (
+          groupedWaypoints.map(({ category, color, waypoints }) => (
+            <div key={category} className="space-y-2">
+              <div 
+                className="text-sm font-medium px-2 py-1 rounded-md"
+                style={{ backgroundColor: `${color}20` }}
+              >
+                {category}
+              </div>
+              {waypoints.map((waypoint) => (
+                <WaypointItem
+                  key={waypoint.id}
+                  id={waypoint.id}
+                  name={waypoint.name}
+                  category={waypoint.category}
+                  categoryColor={getCategoryColor(waypoint.category)}
+                  onDelete={onWaypointDelete}
+                />
+              ))}
+            </div>
+          ))
+        ) : (
+          sortedWaypoints.map((waypoint) => (
+            <WaypointItem
+              key={waypoint.id}
+              id={waypoint.id}
+              name={waypoint.name}
+              category={waypoint.category}
+              categoryColor={getCategoryColor(waypoint.category)}
+              onDelete={onWaypointDelete}
+            />
+          ))
+        )}
       </div>
     </div>
   );
