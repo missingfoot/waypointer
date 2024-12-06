@@ -11,6 +11,18 @@ export const TopNav: React.FC<TopNavProps> = ({
   isAddingWaypoint,
   onToggleAddWaypoint,
 }) => {
+  const [isMoving, setIsMoving] = React.useState(false);
+
+  const handleWaypointClick = () => {
+    if (isMoving) setIsMoving(false);
+    onToggleAddWaypoint();
+  };
+
+  const handleMoveClick = () => {
+    if (isAddingWaypoint) onToggleAddWaypoint();
+    setIsMoving(!isMoving);
+  };
+
   return (
     <div className="h-14 border-b border-border px-4 flex items-center bg-card">
       <Button variant="ghost">
@@ -21,15 +33,16 @@ export const TopNav: React.FC<TopNavProps> = ({
         <Button 
           variant={isAddingWaypoint ? "default" : "ghost"} 
           size="icon"
-          onClick={onToggleAddWaypoint}
+          onClick={handleWaypointClick}
           className={`w-9 h-9 ${isAddingWaypoint ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
         >
           <MapPin className="h-4 w-4" />
         </Button>
         <Button 
-          variant="ghost" 
+          variant={isMoving ? "default" : "ghost"}
           size="icon"
-          className="w-9 h-9"
+          onClick={handleMoveClick}
+          className={`w-9 h-9 ${isMoving ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
         >
           <Move className="h-4 w-4" />
         </Button>

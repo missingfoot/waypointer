@@ -31,8 +31,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onWaypointDelete,
   onCategoryAdd,
   onCategoryDelete,
-  onToggleAddWaypoint,
-  isAddingWaypoint,
 }) => {
   const [newCategory, setNewCategory] = React.useState('');
 
@@ -55,15 +53,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </TabsList>
 
         <TabsContent value="waypoints" className="flex-1 px-4 py-4 space-y-4">
-          <div className="space-y-2">
-            <Button
-              onClick={onToggleAddWaypoint}
-              variant={isAddingWaypoint ? "secondary" : "default"}
-              className="w-full"
-            >
-              {isAddingWaypoint ? 'Cancel Adding Waypoint' : 'Add New Waypoint'}
-            </Button>
-          </div>
           <div className="space-y-2">
             {waypoints.map((waypoint) => (
               <div
