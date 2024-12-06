@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, ListChecks } from 'lucide-react';
+import { Plus, ListChecks, ArrowUpDown } from 'lucide-react';
 import { CategoryItem } from './CategoryItem';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Category {
   id: string;
@@ -16,12 +22,40 @@ interface CategoriesListProps {
   addButtonRef: React.RefObject<HTMLButtonElement>;
 }
 
+type SortOption = 'alphabetical' | 'time';
+type SortDirection = 'asc' | 'desc';
+
 export const CategoriesList: React.FC<CategoriesListProps> = ({
   categories,
   onCategoryDelete,
   onAddClick,
   addButtonRef,
 }) => {
+  const [sortBy, setSortBy] = useState<SortOption>('time');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  const handleSortClick = (newSortBy: SortOption) => {
+    if (sortBy === newSortBy) {
+      // Toggle direction if clicking the same sort option
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Reset direction when changing sort option
+      setSortBy(newSortBy);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedCategories = [...categories].sort((a, b) => {
+    if (sortBy === 'alphabetical') {
+      const comparison = a.name.localeCompare(b.name);
+      return sortDirection === 'asc' ? comparison : -comparison;
+    } else {
+      // For time sorting, we'll use the id as a proxy since it's created sequentially
+      const comparison = a.id.localeCompare(b.id);
+      return sortDirection === 'asc' ? comparison : -comparison;
+    }
+  });
+
   if (categories.length === 0) {
     return (
       <div className="flex flex-col items-start pt-8 space-y-4 text-left">
@@ -43,7 +77,26 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
 
   return (
     <>
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center mb-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8"
+            >
+              <ArrowUpDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => handleSortClick('alphabetical')}>
+              {`Sort Alphabetically ${sortBy === 'alphabetical' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}`}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleSortClick('time')}>
+              {`Sort by Time Added ${sortBy === 'time' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}`}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button
           ref={addButtonRef}
           size="icon"
@@ -55,7 +108,7 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
         </Button>
       </div>
       <div className="space-y-2">
-        {categories.map((category) => (
+        {sortedCategories.map((category) => (
           <CategoryItem
             key={category.id}
             id={category.id}
