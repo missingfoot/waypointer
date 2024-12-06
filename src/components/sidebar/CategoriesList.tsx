@@ -51,7 +51,7 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
             className="mt-4"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Category
+            Add
           </Button>
         </div>
       ) : (
