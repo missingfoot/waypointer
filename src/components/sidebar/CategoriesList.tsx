@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, ListChecks, ArrowUpDown } from 'lucide-react';
+import { Plus, ArrowUp, ArrowDown } from 'lucide-react';
 import { CategoryItem } from './CategoryItem';
 import {
   DropdownMenu,
@@ -43,6 +43,10 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
     }
   };
 
+  const getSortLabel = () => {
+    return sortBy === 'alphabetical' ? 'Alphabetical' : 'Time Added';
+  };
+
   const sortedCategories = [...categories].sort((a, b) => {
     if (sortBy === 'alphabetical') {
       const comparison = a.name.localeCompare(b.name);
@@ -82,16 +86,20 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
               variant="ghost"
               className="h-8"
             >
-              <ArrowUpDown className="h-4 w-4 mr-1" />
-              Sort
+              {getSortLabel()}
+              {sortDirection === 'asc' ? (
+                <ArrowUp className="h-4 w-4 ml-1" />
+              ) : (
+                <ArrowDown className="h-4 w-4 ml-1" />
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuItem onClick={() => handleSortClick('alphabetical')}>
-              {`Sort Alphabetically ${sortBy === 'alphabetical' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}`}
+              Sort Alphabetically
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleSortClick('time')}>
-              {`Sort by Time Added ${sortBy === 'time' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}`}
+              Sort by Time Added
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
