@@ -48,7 +48,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
 
   return (
     <div 
-      className="flex-1 bg-workspace p-4 overflow-hidden"
+      className="flex-1 bg-workspace p-4 h-full"
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
@@ -57,9 +57,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
         onClick={handleClick}
       >
         {!mapUrl ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted-foreground">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted-foreground p-4">
             <Upload className="w-12 h-12" />
-            <p>Drag and drop your map image here or click to upload</p>
+            <p className="text-center">Drag and drop your map image here or click to upload</p>
             <Button
               variant="outline"
               onClick={() => document.getElementById('map-upload')?.click()}
