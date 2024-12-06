@@ -1,5 +1,6 @@
 import React from 'react';
 import { WaypointItem } from './WaypointItem';
+import { MapPin } from 'lucide-react';
 
 interface Waypoint {
   id: string;
@@ -28,6 +29,17 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
     const category = categories.find(cat => cat.name === categoryName);
     return category?.color || '#9b87f5';
   };
+
+  if (waypoints.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[200px] text-center space-y-4 text-muted-foreground">
+        <MapPin className="w-8 h-8" />
+        <p>
+          After adding a map image, select the waypoints tool <MapPin className="w-4 h-4 inline-block mx-1" /> and click on the map to add waypoints
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">
