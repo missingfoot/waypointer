@@ -39,6 +39,12 @@ const Index = () => {
     };
 
     setWaypoints([...waypoints, newWaypoint]);
+    
+    // If the category doesn't exist, add it
+    if (!categories.some(cat => cat.name === point.category)) {
+      handleCategoryAdd(point.category);
+    }
+    
     toast.success('Waypoint added successfully', {
       position: 'top-right'
     });
@@ -52,7 +58,10 @@ const Index = () => {
   };
 
   const handleCategoryAdd = (name: string) => {
-    if (categories.some(cat => cat.name === name)) {
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    
+    if (categories.some(cat => cat.name.toLowerCase() === trimmedName.toLowerCase())) {
       toast.error('Category already exists', {
         position: 'top-right'
       });
@@ -61,9 +70,9 @@ const Index = () => {
     
     const newCategory: Category = {
       id: Math.random().toString(36).substr(2, 9),
-      name,
+      name: trimmedName,
     };
-    setCategories([...categories, newCategory]);
+    setCategories(prevCategories => [...prevCategories, newCategory]);
     toast.success('Category added successfully', {
       position: 'top-right'
     });
