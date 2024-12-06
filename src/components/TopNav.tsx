@@ -1,11 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin, Move, Home, ChevronDown } from 'lucide-react';
+import { MapPin, Move, Home, ChevronDown, Sun, Moon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 interface TopNavProps {
@@ -81,9 +82,33 @@ export const TopNav: React.FC<TopNavProps> = ({
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="ghost">
-          Profile
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+              Profile
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
+              Account Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="py-3 px-4 text-sm cursor-pointer flex items-center justify-between"
+              onClick={onToggleTheme}
+            >
+              Theme
+              {theme === 'dark' ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer text-red-500">
+              Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button>
           Publish
         </Button>
