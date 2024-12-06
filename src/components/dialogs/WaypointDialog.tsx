@@ -1,12 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface WaypointDialogProps {
   open: boolean;
@@ -23,9 +20,9 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
   categories = [],
   onCategoryAdd,
 }) => {
-  const [name, setName] = React.useState('');
-  const [category, setCategory] = React.useState('');
-  const [showSuggestions, setShowSuggestions] = React.useState(false);
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,8 +36,8 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
 
   const handleCategoryChange = (value: string) => {
     setCategory(value);
-    if (value && !categories.some(cat => cat.name === value)) {
-      onCategoryAdd(value);
+    if (!categories.some(cat => cat.name.toLowerCase() === value.toLowerCase())) {
+      setShowSuggestions(true);
     }
   };
 
@@ -74,30 +71,19 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
                 placeholder="Type or select category"
               />
               {showSuggestions && categories.length > 0 && (
-                <div className="absolute w-full mt-1 bg-popover border rounded-md shadow-md z-50">
-                  <Command>
-                    <CommandGroup>
-                      {filteredCategories.map((cat) => (
-                        <CommandItem
-                          key={cat.id}
-                          value={cat.name}
-                          onSelect={(value) => {
-                            setCategory(value);
-                            setShowSuggestions(false);
-                          }}
-                          className="flex items-center px-2 py-1.5 cursor-pointer hover:bg-accent"
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              category === cat.name ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {cat.name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
+                <div className="absolute w-full mt-1 bg-popover border rounded-md shadow-md z-50 max-h-[200px] overflow-y-auto">
+                  {filteredCategories.map((cat) => (
+                    <div
+                      key={cat.id}
+                      className="px-4 py-2 hover:bg-accent cursor-pointer"
+                      onClick={() => {
+                        setCategory(cat.name);
+                        setShowSuggestions(false);
+                      }}
+                    >
+                      {cat.name}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
