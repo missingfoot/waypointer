@@ -44,7 +44,7 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
   };
 
   const getSortLabel = () => {
-    return sortBy === 'alphabetical' ? 'Alphabetical' : 'Time Added';
+    return `Sort by ${sortBy === 'alphabetical' ? 'name' : 'added'}`;
   };
 
   const sortedCategories = [...categories].sort((a, b) => {
@@ -96,10 +96,10 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuItem onClick={() => handleSortClick('alphabetical')}>
-              Sort Alphabetically
+              Sort by name {sortBy === 'alphabetical' && (sortDirection === 'asc' ? <ArrowUp className="h-4 w-4 ml-1" /> : <ArrowDown className="h-4 w-4 ml-1" />)}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleSortClick('time')}>
-              Sort by Time Added
+              Sort by added {sortBy === 'time' && (sortDirection === 'asc' ? <ArrowUp className="h-4 w-4 ml-1" /> : <ArrowDown className="h-4 w-4 ml-1" />)}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
