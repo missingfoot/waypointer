@@ -3,6 +3,7 @@ import { MapWorkspace } from '@/components/MapWorkspace';
 import { Sidebar } from '@/components/Sidebar';
 import { TopNav } from '@/components/TopNav';
 import { toast } from 'sonner';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 
 interface Waypoint {
   id: string;
@@ -71,22 +72,29 @@ const Index = () => {
     <div className="h-screen flex flex-col">
       <TopNav />
       <div className="flex-1 flex overflow-hidden">
-        <Sidebar
-          waypoints={waypoints}
-          categories={categories}
-          onWaypointDelete={handleWaypointDelete}
-          onCategoryAdd={handleCategoryAdd}
-          onCategoryDelete={handleCategoryDelete}
-          onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
-          isAddingWaypoint={isAddingWaypoint}
-        />
-        <MapWorkspace
-          onMapUpload={handleMapUpload}
-          mapUrl={mapUrl}
-          waypoints={waypoints}
-          onWaypointAdd={handleWaypointAdd}
-          isAddingWaypoint={isAddingWaypoint}
-        />
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
+            <Sidebar
+              waypoints={waypoints}
+              categories={categories}
+              onWaypointDelete={handleWaypointDelete}
+              onCategoryAdd={handleCategoryAdd}
+              onCategoryDelete={handleCategoryDelete}
+              onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
+              isAddingWaypoint={isAddingWaypoint}
+            />
+          </ResizablePanel>
+          <ResizableHandle />
+          <ResizablePanel defaultSize={80}>
+            <MapWorkspace
+              onMapUpload={handleMapUpload}
+              mapUrl={mapUrl}
+              waypoints={waypoints}
+              onWaypointAdd={handleWaypointAdd}
+              isAddingWaypoint={isAddingWaypoint}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </div>
   );

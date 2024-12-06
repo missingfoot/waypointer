@@ -3,7 +3,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { MapPin, Folder, Paintbrush, Settings } from 'lucide-react';
 
 interface SidebarProps {
   waypoints: Waypoint[];
@@ -38,23 +37,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [newCategory, setNewCategory] = React.useState('');
 
   return (
-    <div className="w-80 border-r border-border bg-card">
+    <div className="w-full border-r border-border bg-card">
       <Tabs defaultValue="waypoints" className="h-full flex flex-col">
         <TabsList className="justify-start px-4 pt-4 pb-0 h-auto bg-transparent border-b border-border">
-          <TabsTrigger value="waypoints" className="gap-2 data-[state=active]:bg-muted">
-            <MapPin className="w-4 h-4" />
+          <TabsTrigger value="waypoints" className="data-[state=active]:bg-muted">
             Waypoints
           </TabsTrigger>
-          <TabsTrigger value="categories" className="gap-2 data-[state=active]:bg-muted">
-            <Folder className="w-4 h-4" />
+          <TabsTrigger value="categories" className="data-[state=active]:bg-muted">
             Categories
           </TabsTrigger>
-          <TabsTrigger value="design" className="gap-2 data-[state=active]:bg-muted">
-            <Paintbrush className="w-4 h-4" />
+          <TabsTrigger value="design" className="data-[state=active]:bg-muted">
             Design
           </TabsTrigger>
-          <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-muted">
-            <Settings className="w-4 h-4" />
+          <TabsTrigger value="settings" className="data-[state=active]:bg-muted">
             Settings
           </TabsTrigger>
         </TabsList>
