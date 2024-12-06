@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Plus } from 'lucide-react';
 import { CategoryItem } from './CategoryItem';
 import { CategoriesSortControls } from './categories/CategoriesSortControls';
@@ -29,6 +30,7 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
 }) => {
   const [sortBy, setSortBy] = useState<SortOption>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [filterText, setFilterText] = useState('');
 
   const handleSortClick = (newSortBy: SortOption) => {
     if (sortBy === newSortBy) {
@@ -39,7 +41,11 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
     }
   };
 
-  const sortedCategories = [...categories].sort((a, b) => {
+  const filteredCategories = categories.filter(category =>
+    category.name.toLowerCase().includes(filterText.toLowerCase())
+  );
+
+  const sortedCategories = [...filteredCategories].sort((a, b) => {
     if (sortBy === 'alphabetical') {
       const comparison = a.name.localeCompare(b.name);
       return sortDirection === 'asc' ? comparison : -comparison;
@@ -60,6 +66,14 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
 
   return (
     <>
+      <div className="space-y-2 mb-2">
+        <Input
+          placeholder="Filter categories..."
+          value={filterText}
+          onChange={(e) => setFilterText(e.target.value)}
+          className="h-8"
+        />
+      </div>
       <div className="flex justify-between items-center mb-2 -mx-3">
         <CategoriesSortControls
           sortBy={sortBy}
