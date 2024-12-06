@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +24,20 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const descriptionInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      // Focus the description input when dialog opens
+      setTimeout(() => {
+        descriptionInputRef.current?.focus();
+      }, 0);
+    } else {
+      // Reset form when dialog closes
+      setName('');
+      setCategory('');
+    }
+  }, [open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +45,12 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
       onSubmit(name, category);
       setName('');
       setCategory('');
+      onOpenChange(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
       onOpenChange(false);
     }
   };
@@ -55,9 +75,11 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
         left: `${position.x}px`, 
         top: `${position.y}px`
       }}
+      onKeyDown={handleKeyDown}
     >
       <form onSubmit={handleSubmit} className="p-3 space-y-2">
         <Input
+          ref={descriptionInputRef}
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Description"
