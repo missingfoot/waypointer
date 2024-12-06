@@ -17,7 +17,7 @@ export const TopNav: React.FC<TopNavProps> = ({
   isAddingWaypoint,
   onToggleAddWaypoint,
 }) => {
-  const [isMoving, setIsMoving] = React.useState(true); // Set to true by default
+  const [isMoving, setIsMoving] = React.useState(true);
 
   const handleWaypointClick = () => {
     if (isMoving) setIsMoving(false);
@@ -45,10 +45,10 @@ export const TopNav: React.FC<TopNavProps> = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
             <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
-              Rename Project
+              Project Settings
             </DropdownMenuItem>
             <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
-              Project Settings
+              Rename Project
             </DropdownMenuItem>
             <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
               Duplicate Project
