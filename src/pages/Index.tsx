@@ -112,7 +112,7 @@ const Index = () => {
       />
       <div className="flex-1 flex overflow-hidden">
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
+          <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
             <Sidebar
               waypoints={waypoints}
               categories={categories}
@@ -124,7 +124,7 @@ const Index = () => {
             />
           </ResizablePanel>
           <ResizableHandle />
-          <ResizablePanel defaultSize={80}>
+          <ResizablePanel defaultSize={75}>
             <MapWorkspace
               onMapUpload={handleMapUpload}
               mapUrl={mapUrl}
