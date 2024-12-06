@@ -110,9 +110,9 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
         />
         <Button
           size="sm"
-          variant={groupByCategory ? "default" : "ghost"}
+          variant="ghost"
           onClick={() => setGroupByCategory(!groupByCategory)}
-          className="h-8 px-3"
+          className={`h-8 px-3 ${groupByCategory ? 'bg-primary/10 text-primary hover:bg-primary/20' : ''}`}
         >
           <Group className="h-4 w-4 mr-1" />
           Group
