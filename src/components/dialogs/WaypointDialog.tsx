@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface WaypointDialogProps {
@@ -25,8 +25,7 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
 }) => {
   const [name, setName] = React.useState('');
   const [category, setCategory] = React.useState('');
-  const [openCombobox, setOpenCombobox] = React.useState(false);
-  const [searchValue, setSearchValue] = React.useState('');
+  const [showSuggestions, setShowSuggestions] = React.useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,19 +37,16 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
     }
   };
 
-  const handleSelect = (currentValue: string) => {
-    setCategory(currentValue);
-    setOpenCombobox(false);
-  };
-
-  const handleCreateCategory = () => {
-    if (searchValue && !categories.some(cat => cat.name === searchValue)) {
-      onCategoryAdd(searchValue);
-      setCategory(searchValue);
-      setSearchValue('');
-      setOpenCombobox(false);
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+    if (value && !categories.some(cat => cat.name === value)) {
+      onCategoryAdd(value);
     }
   };
+
+  const filteredCategories = categories.filter(cat => 
+    cat.name.toLowerCase().includes(category.toLowerCase())
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -70,55 +66,41 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
           </div>
           <div className="space-y-2">
             <Label>Category</Label>
-            <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={openCombobox}
-                  className="w-full justify-between"
-                >
-                  {category || "Select category..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                <Command>
-                  <CommandInput 
-                    placeholder="Search or create category..."
-                    value={searchValue}
-                    onValueChange={setSearchValue}
-                  />
-                  <CommandEmpty>
-                    <Button 
-                      type="button"
-                      variant="ghost" 
-                      className="w-full justify-start"
-                      onClick={handleCreateCategory}
-                    >
-                      Create "{searchValue}"
-                    </Button>
-                  </CommandEmpty>
-                  <CommandGroup>
-                    {categories.map((cat) => (
-                      <CommandItem
-                        key={cat.id}
-                        value={cat.name}
-                        onSelect={handleSelect}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            category === cat.name ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {cat.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <div className="relative">
+              <Input
+                value={category}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                onFocus={() => setShowSuggestions(true)}
+                placeholder="Type or select category"
+              />
+              {showSuggestions && categories.length > 0 && (
+                <div className="absolute w-full mt-1 bg-popover border rounded-md shadow-md z-50">
+                  <Command>
+                    <CommandGroup>
+                      {filteredCategories.map((cat) => (
+                        <CommandItem
+                          key={cat.id}
+                          value={cat.name}
+                          onSelect={(value) => {
+                            setCategory(value);
+                            setShowSuggestions(false);
+                          }}
+                          className="flex items-center px-2 py-1.5 cursor-pointer hover:bg-accent"
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              category === cat.name ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {cat.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </div>
+              )}
+            </div>
           </div>
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
