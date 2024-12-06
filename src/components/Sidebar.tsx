@@ -78,10 +78,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {waypoints.map((waypoint) => (
               <div
                 key={waypoint.id}
-                className="flex items-center justify-between p-2 rounded-md bg-muted relative overflow-hidden"
+                className="flex items-center justify-between p-2 rounded-md bg-muted relative"
               >
                 <div
-                  className="absolute left-0 top-0 bottom-0 w-6"
+                  className="absolute inset-y-2 left-2 w-6 rounded-md"
                   style={{ backgroundColor: getCategoryColor(waypoint.category) }}
                 />
                 <div className="flex items-center gap-2 pl-8">
@@ -118,10 +118,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {categories.map((category) => (
               <div
                 key={category.id}
-                className="flex items-center justify-between p-2 rounded-md bg-muted relative overflow-hidden"
+                className="flex items-center justify-between p-2 rounded-md bg-muted relative"
               >
                 <div
-                  className="absolute left-0 top-0 bottom-0 w-6"
+                  className="absolute inset-y-2 left-2 w-6 rounded-md"
                   style={{ backgroundColor: category.color }}
                 />
                 <div className="flex items-center gap-2 pl-8">
