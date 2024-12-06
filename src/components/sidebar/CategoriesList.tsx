@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, ArrowUp, ArrowDown, ListChecks } from 'lucide-react';
 import { CategoryItem } from './CategoryItem';
 import {
   DropdownMenu,
