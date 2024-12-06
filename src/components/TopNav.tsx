@@ -19,10 +19,10 @@ export const TopNav: React.FC<TopNavProps> = ({
       
       <div className="flex-1 flex justify-center gap-2">
         <Button 
-          variant={isAddingWaypoint ? "secondary" : "ghost"} 
+          variant={isAddingWaypoint ? "default" : "ghost"} 
           size="icon"
           onClick={onToggleAddWaypoint}
-          className="w-9 h-9"
+          className={`w-9 h-9 ${isAddingWaypoint ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
         >
           <MapPin className="h-4 w-4" />
         </Button>

@@ -89,7 +89,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     >
       <div 
         ref={containerRef}
-        className="w-full h-full relative bg-white rounded-lg shadow-sm border border-border overflow-hidden select-none"
+        className={`w-full h-full relative bg-[repeating-linear-gradient(45deg,#fafad2,#fafad2_10px,#fff_10px,#fff_20px)] rounded-lg shadow-sm border border-border overflow-hidden select-none ${
+          isAddingWaypoint ? 'cursor-crosshair' : 'cursor-grab'
+        } ${isDragging ? 'cursor-grabbing' : ''}`}
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -125,7 +127,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                 transformOrigin: '0 0',
                 transition: isDragging ? 'none' : 'transform 0.1s ease-out'
               }}
-              className="absolute inset-0"
+              className="absolute inset-0 bg-white"
             >
               <img 
                 src={mapUrl} 
