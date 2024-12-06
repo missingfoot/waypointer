@@ -17,8 +17,8 @@ interface MapWorkspaceProps {
   }>;
   onWaypointAdd: (point: { x: number; y: number; name: string; category: string }) => void;
   isAddingWaypoint: boolean;
-  categories: Array<{ id: string; name: string }>;
-  onCategoryAdd: (name: string) => void;
+  categories: Array<{ id: string; name: string; color: string }>;
+  onCategoryAdd: (name: string, color: string) => void;
 }
 
 export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
