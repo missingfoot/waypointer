@@ -20,13 +20,13 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
   open,
   onOpenChange,
   onSubmit,
-  categories = [], // Provide default empty array
+  categories = [],
   onCategoryAdd,
 }) => {
   const [name, setName] = React.useState('');
   const [category, setCategory] = React.useState('');
   const [openCombobox, setOpenCombobox] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState('');
+  const [searchValue, setSearchValue] = React.useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,10 +44,10 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
   };
 
   const handleCreateCategory = () => {
-    if (inputValue && !categories.some(cat => cat.name === inputValue)) {
-      onCategoryAdd(inputValue);
-      setCategory(inputValue);
-      setInputValue('');
+    if (searchValue && !categories.some(cat => cat.name === searchValue)) {
+      onCategoryAdd(searchValue);
+      setCategory(searchValue);
+      setSearchValue('');
       setOpenCombobox(false);
     }
   };
@@ -85,9 +85,9 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
               <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                 <Command>
                   <CommandInput 
-                    placeholder="Search or create category..." 
-                    value={inputValue}
-                    onValueChange={setInputValue}
+                    placeholder="Search or create category..."
+                    value={searchValue}
+                    onValueChange={setSearchValue}
                   />
                   <CommandEmpty>
                     <Button 
@@ -96,7 +96,7 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
                       className="w-full justify-start"
                       onClick={handleCreateCategory}
                     >
-                      Create "{inputValue}"
+                      Create "{searchValue}"
                     </Button>
                   </CommandEmpty>
                   <CommandGroup>
