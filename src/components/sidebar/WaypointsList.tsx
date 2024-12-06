@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
 import { WaypointItem } from './WaypointItem';
 import { MapPin } from 'lucide-react';
 
@@ -25,10 +26,17 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
   categories,
   onWaypointDelete,
 }) => {
+  const [filterText, setFilterText] = useState('');
+
   const getCategoryColor = (categoryName: string) => {
     const category = categories.find(cat => cat.name === categoryName);
     return category?.color || '#9b87f5';
   };
+
+  const filteredWaypoints = waypoints.filter(waypoint =>
+    waypoint.name.toLowerCase().includes(filterText.toLowerCase()) ||
+    waypoint.category.toLowerCase().includes(filterText.toLowerCase())
+  );
 
   if (waypoints.length === 0) {
     return (
@@ -43,7 +51,15 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
 
   return (
     <div className="space-y-2">
-      {waypoints.map((waypoint) => (
+      <div className="space-y-2 mb-2">
+        <Input
+          placeholder="Filter waypoints..."
+          value={filterText}
+          onChange={(e) => setFilterText(e.target.value)}
+          className="h-8"
+        />
+      </div>
+      {filteredWaypoints.map((waypoint) => (
         <WaypointItem
           key={waypoint.id}
           id={waypoint.id}
