@@ -4,7 +4,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { TopNav } from '@/components/TopNav';
 import { toast } from 'sonner';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from 'next-themes';
 
 const Index = () => {
   const [mapUrl, setMapUrl] = React.useState<string | null>(null);
@@ -21,7 +21,7 @@ const Index = () => {
     color: string;
   }>>([]);
   const [isAddingWaypoint, setIsAddingWaypoint] = React.useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   const handleMapUpload = (file: File) => {
     const url = URL.createObjectURL(file);
@@ -90,8 +90,8 @@ const Index = () => {
       <TopNav 
         isAddingWaypoint={isAddingWaypoint}
         onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
-        theme={theme}
-        onToggleTheme={toggleTheme}
+        theme={theme as 'light' | 'dark' | 'system'}
+        onToggleTheme={(newTheme) => setTheme(newTheme)}
       />
       <div className="flex-1 flex overflow-hidden">
         <ResizablePanelGroup direction="horizontal">

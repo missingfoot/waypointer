@@ -16,8 +16,8 @@ import {
 interface TopNavProps {
   isAddingWaypoint: boolean;
   onToggleAddWaypoint: () => void;
-  theme: 'light' | 'dark';
-  onToggleTheme: () => void;
+  theme: 'light' | 'dark' | 'system';
+  onToggleTheme: (theme: 'light' | 'dark' | 'system') => void;
 }
 
 export const TopNav: React.FC<TopNavProps> = ({
@@ -102,15 +102,24 @@ export const TopNav: React.FC<TopNavProps> = ({
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
-                  <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
+                  <DropdownMenuItem 
+                    className="py-3 px-4 text-sm cursor-pointer"
+                    onClick={() => onToggleTheme('light')}
+                  >
                     <Sun className="h-4 w-4 mr-2" />
                     Light
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
+                  <DropdownMenuItem 
+                    className="py-3 px-4 text-sm cursor-pointer"
+                    onClick={() => onToggleTheme('dark')}
+                  >
                     <Moon className="h-4 w-4 mr-2" />
                     Dark
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
+                  <DropdownMenuItem 
+                    className="py-3 px-4 text-sm cursor-pointer"
+                    onClick={() => onToggleTheme('system')}
+                  >
                     <Laptop className="h-4 w-4 mr-2" />
                     System
                   </DropdownMenuItem>
