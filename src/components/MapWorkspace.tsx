@@ -36,6 +36,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   const [isPanning, setIsPanning] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null);
+  const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
   
   const {
     scale,
@@ -101,6 +102,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     const boundedY = Math.max(0, Math.min(100, gridY));
 
     setPendingPoint({ x: boundedX, y: boundedY });
+    setDialogPosition({ x: e.clientX, y: e.clientY });
     setDialogOpen(true);
     setHasMouseMoved(false);
     setIsPanning(false);
@@ -158,6 +160,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
         onSubmit={handleWaypointSubmit}
         categories={categories}
         onCategoryAdd={onCategoryAdd}
+        position={dialogPosition}
       />
     </div>
   );

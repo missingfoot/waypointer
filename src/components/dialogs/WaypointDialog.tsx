@@ -10,6 +10,7 @@ interface WaypointDialogProps {
   onSubmit: (name: string, category: string) => void;
   categories: Array<{ id: string; name: string }>;
   onCategoryAdd: (name: string) => void;
+  position: { x: number; y: number };
 }
 
 export const WaypointDialog: React.FC<WaypointDialogProps> = ({
@@ -18,6 +19,7 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
   onSubmit,
   categories = [],
   onCategoryAdd,
+  position,
 }) => {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
@@ -47,7 +49,14 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
   if (!open) return null;
 
   return (
-    <div className="absolute top-4 left-4 w-64 bg-background border rounded-lg shadow-lg z-50">
+    <div 
+      className="fixed w-64 bg-background border rounded-lg shadow-lg z-50"
+      style={{ 
+        left: `${position.x}px`, 
+        top: `${position.y}px`,
+        transform: 'translate(-50%, -100%) translateY(-8px)'
+      }}
+    >
       <form onSubmit={handleSubmit} className="p-3 space-y-2">
         <div className="space-y-1">
           <Label htmlFor="name" className="text-xs">Name</Label>
