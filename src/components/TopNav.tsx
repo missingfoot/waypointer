@@ -43,14 +43,14 @@ export const TopNav: React.FC<TopNavProps> = ({
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
               Rename Project
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
               Project Settings
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer">
               Duplicate Project
             </DropdownMenuItem>
           </DropdownMenuContent>
