@@ -32,9 +32,9 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
 
   if (waypoints.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-[200px] text-center space-y-4 text-muted-foreground">
-        <MapPin className="w-8 h-8" />
-        <p>
+      <div className="flex flex-col items-start pt-8 space-y-4 text-left">
+        <MapPin className="w-8 h-8 text-muted-foreground" />
+        <p className="text-muted-foreground">
           After adding a map image, select the waypoints tool <MapPin className="w-4 h-4 inline-block mx-1" /> and click on the map to add waypoints
         </p>
       </div>
