@@ -51,15 +51,27 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     const rect = mapContainerRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    // Calculate the click position relative to the transformed container
-    const x = ((e.clientX - rect.left - position.x) / scale / rect.width) * 100;
-    const y = ((e.clientY - rect.top - position.y) / scale / rect.height) * 100;
-    
+    // Calculate the click position relative to the map container
+    const x = (e.clientX - rect.left);
+    const y = (e.clientY - rect.top);
+
+    // Adjust for current pan position and scale
+    const adjustedX = (x - position.x) / scale;
+    const adjustedY = (y - position.y) / scale;
+
+    // Convert to percentage
+    const percentX = (adjustedX / rect.width) * 100;
+    const percentY = (adjustedY / rect.height) * 100;
+
     // Round to nearest grid cell (10% intervals)
-    const gridX = Math.round(x / 10) * 10;
-    const gridY = Math.round(y / 10) * 10;
-    
-    onWaypointAdd({ x: gridX, y: gridY });
+    const gridX = Math.round(percentX / 10) * 10;
+    const gridY = Math.round(percentY / 10) * 10;
+
+    // Ensure coordinates are within bounds (0-100)
+    const boundedX = Math.max(0, Math.min(100, gridX));
+    const boundedY = Math.max(0, Math.min(100, gridY));
+
+    onWaypointAdd({ x: boundedX, y: boundedY });
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
