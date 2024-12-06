@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, ArrowUp, ArrowDown, ListChecks } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { CategoryItem } from './CategoryItem';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { CategoriesSortControls } from './categories/CategoriesSortControls';
+import { CategoriesEmptyState } from './categories/CategoriesEmptyState';
 
 interface Category {
   id: string;
@@ -43,11 +39,6 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
     }
   };
 
-  const getSortLabel = () => {
-    const label = sortBy === 'alphabetical' ? 'Name' : 'Time added';
-    return `${label}`;
-  };
-
   const sortedCategories = [...categories].sort((a, b) => {
     if (sortBy === 'alphabetical') {
       const comparison = a.name.localeCompare(b.name);
@@ -60,51 +51,21 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
 
   if (categories.length === 0) {
     return (
-      <div className="flex flex-col items-start pt-8 space-y-4 text-left">
-        <ListChecks className="w-8 h-8 text-muted-foreground" />
-        <p className="text-muted-foreground">
-          Set up categories to organize your waypoints, or add them automatically as you create new waypoints
-        </p>
-        <Button
-          ref={addButtonRef}
-          onClick={onAddClick}
-          variant="outline"
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          Add
-        </Button>
-      </div>
+      <CategoriesEmptyState
+        onAddClick={onAddClick}
+        addButtonRef={addButtonRef}
+      />
     );
   }
 
   return (
     <>
       <div className="flex justify-between items-center mb-2 -mx-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-8 px-3"
-            >
-              {getSortLabel()}
-              {sortDirection === 'asc' ? (
-                <ArrowUp className="h-4 w-4 ml-1" />
-              ) : (
-                <ArrowDown className="h-4 w-4 ml-1" />
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => handleSortClick('alphabetical')}>
-              Sort by name {sortBy === 'alphabetical' && (sortDirection === 'asc' ? <ArrowUp className="h-4 w-4 ml-1" /> : <ArrowDown className="h-4 w-4 ml-1" />)}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleSortClick('time')}>
-              Sort by time added {sortBy === 'time' && (sortDirection === 'asc' ? <ArrowUp className="h-4 w-4 ml-1" /> : <ArrowDown className="h-4 w-4 ml-1" />)}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
+        <CategoriesSortControls
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          onSortChange={handleSortClick}
+        />
         <Button
           ref={addButtonRef}
           size="sm"
