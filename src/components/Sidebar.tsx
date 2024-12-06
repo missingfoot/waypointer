@@ -78,13 +78,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {waypoints.map((waypoint) => (
               <div
                 key={waypoint.id}
-                className="flex items-center justify-between p-2 rounded-md bg-muted"
+                className="flex items-center justify-between p-2 rounded-md bg-muted relative overflow-hidden"
               >
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: getCategoryColor(waypoint.category) }}
-                  />
+                <div
+                  className="absolute left-0 top-0 bottom-0 w-1.5"
+                  style={{ backgroundColor: getCategoryColor(waypoint.category) }}
+                />
+                <div className="flex items-center gap-2 pl-3">
                   <div>
                     <p className="font-medium">{waypoint.name}</p>
                     <p className="text-sm text-muted-foreground">{waypoint.category}</p>
@@ -118,13 +118,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {categories.map((category) => (
               <div
                 key={category.id}
-                className="flex items-center justify-between p-2 rounded-md bg-muted"
+                className="flex items-center justify-between p-2 rounded-md bg-muted relative overflow-hidden"
               >
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: category.color }}
-                  />
+                <div
+                  className="absolute left-0 top-0 bottom-0 w-1.5"
+                  style={{ backgroundColor: category.color }}
+                />
+                <div className="flex items-center gap-2 pl-3">
                   <span>{category.name}</span>
                 </div>
                 <Button
