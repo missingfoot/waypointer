@@ -11,11 +11,15 @@ import {
 interface TopNavProps {
   isAddingWaypoint: boolean;
   onToggleAddWaypoint: () => void;
+  theme: 'light' | 'dark';
+  onToggleTheme: () => void;
 }
 
 export const TopNav: React.FC<TopNavProps> = ({
   isAddingWaypoint,
   onToggleAddWaypoint,
+  theme,
+  onToggleTheme,
 }) => {
   const [isMoving, setIsMoving] = React.useState(true);
 
