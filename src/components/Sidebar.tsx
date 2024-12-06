@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Plus } from 'lucide-react';
+import { CategoryDialog } from './dialogs/CategoryDialog';
 
 interface SidebarProps {
   waypoints: Waypoint[];
@@ -32,7 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCategoryAdd,
   onCategoryDelete,
 }) => {
-  const [newCategory, setNewCategory] = React.useState('');
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
 
   return (
     <div className="w-full border-r border-border bg-card">
@@ -76,26 +76,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </TabsContent>
 
         <TabsContent value="categories" className="flex-1 px-4 py-4 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="new-category">New Category</Label>
-            <div className="flex gap-2">
-              <Input
-                id="new-category"
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-                placeholder="Category name"
-              />
-              <Button
-                onClick={() => {
-                  if (newCategory.trim()) {
-                    onCategoryAdd(newCategory.trim());
-                    setNewCategory('');
-                  }
-                }}
-              >
-                Add
-              </Button>
-            </div>
+          <div className="flex justify-end">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setIsCategoryDialogOpen(true)}
+              className="h-8 w-8"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
           <div className="space-y-2">
             {categories.map((category) => (
@@ -124,6 +113,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <p className="text-muted-foreground">Additional settings coming soon...</p>
         </TabsContent>
       </Tabs>
+
+      <CategoryDialog
+        open={isCategoryDialogOpen}
+        onOpenChange={setIsCategoryDialogOpen}
+        onSubmit={onCategoryAdd}
+        categories={categories}
+      />
     </div>
   );
 };
