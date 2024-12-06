@@ -20,7 +20,7 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
   open,
   onOpenChange,
   onSubmit,
-  categories,
+  categories = [], // Provide default empty array
   onCategoryAdd,
 }) => {
   const [name, setName] = React.useState('');
