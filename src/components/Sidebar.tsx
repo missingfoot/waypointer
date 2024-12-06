@@ -57,24 +57,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <Tabs defaultValue="waypoints" className="h-full flex flex-col">
         <TabsHeader />
 
-        <TabsContent value="waypoints" className="flex-1 px-4 py-4 space-y-4">
-          <WaypointsList
-            waypoints={waypoints}
-            categories={categories}
-            onWaypointDelete={onWaypointDelete}
-          />
-        </TabsContent>
+        <div className="flex-1 px-4 py-4">
+          <TabsContent value="waypoints" className="mt-0 h-full">
+            <WaypointsList
+              waypoints={waypoints}
+              categories={categories}
+              onWaypointDelete={onWaypointDelete}
+            />
+          </TabsContent>
 
-        <TabsContent value="categories" className="flex-1 px-4 py-4 space-y-4">
-          <CategoriesList
-            categories={categories}
-            onCategoryDelete={onCategoryDelete}
-            onAddClick={handleAddCategoryClick}
-            addButtonRef={addButtonRef}
-          />
-        </TabsContent>
+          <TabsContent value="categories" className="mt-0 h-full">
+            <CategoriesList
+              categories={categories}
+              onCategoryDelete={onCategoryDelete}
+              onAddClick={handleAddCategoryClick}
+              addButtonRef={addButtonRef}
+            />
+          </TabsContent>
 
-        <SettingsTab />
+          <TabsContent value="settings" className="mt-0 h-full">
+            <SettingsTab />
+          </TabsContent>
+        </div>
       </Tabs>
 
       <CategoryDialog
