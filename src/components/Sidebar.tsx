@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import { CategoryDialog } from './dialogs/CategoryDialog';
+import { WaypointsList } from './sidebar/WaypointsList';
+import { CategoriesList } from './sidebar/CategoriesList';
 
 interface SidebarProps {
   waypoints: Waypoint[];
@@ -50,11 +50,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setIsCategoryDialogOpen(true);
   };
 
-  const getCategoryColor = (categoryName: string) => {
-    const category = categories.find(cat => cat.name === categoryName);
-    return category?.color || '#9b87f5';
-  };
-
   return (
     <div className="w-full border-r border-border bg-card">
       <Tabs defaultValue="waypoints" className="h-full flex flex-col">
@@ -74,69 +69,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </TabsList>
 
         <TabsContent value="waypoints" className="flex-1 px-4 py-4 space-y-4">
-          <div className="space-y-2">
-            {waypoints.map((waypoint) => (
-              <div
-                key={waypoint.id}
-                className="flex items-center justify-between p-2 rounded-md bg-muted relative"
-              >
-                <div
-                  className="absolute inset-y-2 left-2 w-1.5 rounded-[9999px]"
-                  style={{ backgroundColor: getCategoryColor(waypoint.category) }}
-                />
-                <div className="flex items-center gap-2 pl-4">
-                  <div>
-                    <p className="font-medium">{waypoint.name}</p>
-                    <p className="text-sm text-muted-foreground">{waypoint.category}</p>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onWaypointDelete(waypoint.id)}
-                >
-                  Delete
-                </Button>
-              </div>
-            ))}
-          </div>
+          <WaypointsList
+            waypoints={waypoints}
+            categories={categories}
+            onWaypointDelete={onWaypointDelete}
+          />
         </TabsContent>
 
         <TabsContent value="categories" className="flex-1 px-4 py-4 space-y-4">
-          <div className="flex justify-end">
-            <Button
-              ref={addButtonRef}
-              size="icon"
-              variant="ghost"
-              onClick={handleAddCategoryClick}
-              className="h-8 w-8"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="space-y-2">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className="flex items-center justify-between p-2 rounded-md bg-muted relative"
-              >
-                <div
-                  className="absolute inset-y-2 left-2 w-1.5 rounded-[9999px]"
-                  style={{ backgroundColor: category.color }}
-                />
-                <div className="flex items-center gap-2 pl-4">
-                  <span>{category.name}</span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onCategoryDelete(category.id)}
-                >
-                  Delete
-                </Button>
-              </div>
-            ))}
-          </div>
+          <CategoriesList
+            categories={categories}
+            onCategoryDelete={onCategoryDelete}
+            onAddClick={handleAddCategoryClick}
+            addButtonRef={addButtonRef}
+          />
         </TabsContent>
 
         <TabsContent value="design" className="flex-1 p-4">
