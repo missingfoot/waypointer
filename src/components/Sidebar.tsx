@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -31,8 +31,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onWaypointDelete,
   onCategoryAdd,
   onCategoryDelete,
+  onToggleAddWaypoint,
+  isAddingWaypoint,
 }) => {
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+
+  const handleAddCategoryClick = () => {
+    const buttonRect = addButtonRef.current?.getBoundingClientRect();
+    if (buttonRect) {
+      setDialogPosition({
+        x: buttonRect.left,
+        y: buttonRect.bottom + 5
+      });
+    }
+    setIsCategoryDialogOpen(true);
+  };
 
   return (
     <div className="w-full border-r border-border bg-card">
@@ -78,9 +93,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <TabsContent value="categories" className="flex-1 px-4 py-4 space-y-4">
           <div className="flex justify-end">
             <Button
+              ref={addButtonRef}
               size="icon"
               variant="ghost"
-              onClick={() => setIsCategoryDialogOpen(true)}
+              onClick={handleAddCategoryClick}
               className="h-8 w-8"
             >
               <Plus className="h-4 w-4" />
@@ -119,6 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onOpenChange={setIsCategoryDialogOpen}
         onSubmit={onCategoryAdd}
         categories={categories}
+        position={dialogPosition}
       />
     </div>
   );

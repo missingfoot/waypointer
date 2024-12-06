@@ -8,6 +8,7 @@ interface CategoryDialogProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (name: string) => void;
   categories: Array<{ id: string; name: string }>;
+  position: { x: number; y: number };
 }
 
 export const CategoryDialog: React.FC<CategoryDialogProps> = ({
@@ -15,18 +16,17 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
   onOpenChange,
   onSubmit,
   categories,
+  position,
 }) => {
   const [name, setName] = useState('');
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
-      // Focus the name input when dialog opens
       setTimeout(() => {
         nameInputRef.current?.focus();
       }, 0);
     } else {
-      // Reset form when dialog closes
       setName('');
     }
   }, [open]);
@@ -52,7 +52,11 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
 
   return (
     <div 
-      className="fixed w-64 bg-background border rounded-lg shadow-lg z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+      className="fixed w-64 bg-background border rounded-lg shadow-lg z-50"
+      style={{ 
+        left: `${position.x}px`, 
+        top: `${position.y}px`
+      }}
       onKeyDown={handleKeyDown}
     >
       <form onSubmit={handleSubmit} className="p-3 space-y-2">
