@@ -67,6 +67,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     setHasMouseMoved(false);
     setMouseStartPosition({ x: e.clientX, y: e.clientY });
     handleMouseDown(e);
+    if (!isAddingWaypoint) {
+      setIsPanning(true);
+    }
   };
 
   const handleMapMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -75,7 +78,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     
     if (deltaX > 5 || deltaY > 5) {
       setHasMouseMoved(true);
-      setIsPanning(true);
+      if (!isAddingWaypoint && isDragging) {
+        setIsPanning(true);
+      }
     }
     handleMouseMove(e);
   };
@@ -117,6 +122,16 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     }
   };
 
+  const getCursorStyle = () => {
+    if (!mapUrl) return '';
+    if (isDragging) return 'cursor-grabbing';
+    if (isAddingWaypoint) {
+      if (isPanning) return 'cursor-grabbing';
+      return 'cursor-crosshair';
+    }
+    return 'cursor-grab';
+  };
+
   return (
     <div 
       className="flex-1 bg-workspace p-4 h-full"
@@ -127,9 +142,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
         ref={containerRef}
         className={`w-full h-full relative rounded-lg shadow-sm border border-border overflow-hidden select-none ${
           mapUrl ? 'bg-[repeating-linear-gradient(45deg,#fafad2,#fafad2_10px,#fff_10px,#fff_20px)]' : 'bg-white'
-        } ${
-          isAddingWaypoint && !isPanning ? 'cursor-crosshair' : 'cursor-grab'
-        } ${isDragging ? 'cursor-grabbing' : ''}`}
+        } ${getCursorStyle()}`}
         onMouseDown={handleMapMouseDown}
         onMouseMove={handleMapMouseMove}
         onMouseUp={handleMapMouseUp}
