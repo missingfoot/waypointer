@@ -48,8 +48,10 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
           {categories.map((category) => (
             <CategoryItem
               key={category.id}
-              category={category}
-              onDelete={() => onCategoryDelete(category.id)}
+              id={category.id}
+              name={category.name}
+              color={category.color}
+              onDelete={onCategoryDelete}
             />
           ))}
         </div>
