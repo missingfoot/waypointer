@@ -57,7 +57,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     if (file && file.type.startsWith('image/')) {
       onMapUpload(file);
     } else {
-      toast.error('Please upload an image file');
+      toast.error('Please upload an image file', {
+        position: 'top-right'
+      });
     }
   };
 

@@ -27,7 +27,9 @@ const Index = () => {
   const handleMapUpload = (file: File) => {
     const url = URL.createObjectURL(file);
     setMapUrl(url);
-    toast.success('Map uploaded successfully');
+    toast.success('Map uploaded successfully', {
+      position: 'top-right'
+    });
   };
 
   const handleWaypointAdd = (point: { x: number; y: number; name: string; category: string }) => {
@@ -37,17 +39,23 @@ const Index = () => {
     };
 
     setWaypoints([...waypoints, newWaypoint]);
-    toast.success('Waypoint added successfully');
+    toast.success('Waypoint added successfully', {
+      position: 'top-right'
+    });
   };
 
   const handleWaypointDelete = (id: string) => {
     setWaypoints(waypoints.filter((wp) => wp.id !== id));
-    toast.success('Waypoint deleted successfully');
+    toast.success('Waypoint deleted successfully', {
+      position: 'top-right'
+    });
   };
 
   const handleCategoryAdd = (name: string) => {
     if (categories.some(cat => cat.name === name)) {
-      toast.error('Category already exists');
+      toast.error('Category already exists', {
+        position: 'top-right'
+      });
       return;
     }
     
@@ -56,12 +64,16 @@ const Index = () => {
       name,
     };
     setCategories([...categories, newCategory]);
-    toast.success('Category added successfully');
+    toast.success('Category added successfully', {
+      position: 'top-right'
+    });
   };
 
   const handleCategoryDelete = (id: string) => {
     setCategories(categories.filter((cat) => cat.id !== id));
-    toast.success('Category deleted successfully');
+    toast.success('Category deleted successfully', {
+      position: 'top-right'
+    });
   };
 
   return (
