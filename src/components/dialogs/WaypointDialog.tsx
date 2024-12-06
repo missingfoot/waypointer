@@ -8,8 +8,8 @@ interface WaypointDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (name: string, category: string) => void;
-  categories: Array<{ id: string; name: string }>;
-  onCategoryAdd: (name: string) => void;
+  categories: Array<{ id: string; name: string; color: string }>;
+  onCategoryAdd: (name: string, color: string) => void;
   position: { x: number; y: number };
 }
 
@@ -28,12 +28,10 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
 
   useEffect(() => {
     if (open) {
-      // Focus the description input when dialog opens
       setTimeout(() => {
         descriptionInputRef.current?.focus();
       }, 0);
     } else {
-      // Reset form when dialog closes
       setName('');
       setCategory('');
       setShowSuggestions(false);
@@ -90,7 +88,6 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
             onChange={(e) => handleCategoryChange(e.target.value)}
             onFocus={() => setShowSuggestions(true)}
             onBlur={() => {
-              // Delay hiding suggestions to allow for click events
               setTimeout(() => setShowSuggestions(false), 200);
             }}
             placeholder="Type category"
@@ -102,12 +99,16 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
               {filteredCategories.map((cat) => (
                 <div
                   key={cat.id}
-                  className="px-2 py-1 text-sm hover:bg-accent cursor-pointer"
+                  className="px-2 py-1 text-sm hover:bg-accent cursor-pointer flex items-center gap-2"
                   onClick={() => {
                     setCategory(cat.name);
                     setShowSuggestions(false);
                   }}
                 >
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: cat.color }}
+                  />
                   {cat.name}
                 </div>
               ))}

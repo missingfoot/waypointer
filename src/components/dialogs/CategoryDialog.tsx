@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface CategoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (name: string) => void;
-  categories: Array<{ id: string; name: string }>;
+  onSubmit: (name: string, color: string) => void;
+  categories: Array<{ id: string; name: string; color: string }>;
   position: { x: number; y: number };
 }
 
@@ -19,6 +20,7 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
   position,
 }) => {
   const [name, setName] = useState('');
+  const [color, setColor] = useState('#9b87f5');
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -28,14 +30,16 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
       }, 0);
     } else {
       setName('');
+      setColor('#9b87f5');
     }
   }, [open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      onSubmit(name.trim());
+      onSubmit(name.trim(), color);
       setName('');
+      setColor('#9b87f5');
       onOpenChange(false);
     }
   };
@@ -60,14 +64,37 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
       onKeyDown={handleKeyDown}
     >
       <form onSubmit={handleSubmit} className="p-3 space-y-2">
-        <Input
-          ref={nameInputRef}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Category name"
-          className="h-8 text-sm"
-          autoComplete="off"
-        />
+        <div className="space-y-1">
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            ref={nameInputRef}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Category name"
+            className="h-8 text-sm"
+            autoComplete="off"
+          />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="color">Color</Label>
+          <div className="flex gap-2">
+            <Input
+              id="color"
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              className="h-8 w-16 p-1 cursor-pointer"
+            />
+            <Input
+              type="text"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              className="h-8 text-sm flex-1"
+              placeholder="#000000"
+            />
+          </div>
+        </div>
         <div className="flex justify-end space-x-2 pt-1">
           <Button 
             type="button" 

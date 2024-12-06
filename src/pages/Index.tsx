@@ -16,6 +16,7 @@ interface Waypoint {
 interface Category {
   id: string;
   name: string;
+  color: string;
 }
 
 const Index = () => {
@@ -40,9 +41,9 @@ const Index = () => {
 
     setWaypoints([...waypoints, newWaypoint]);
     
-    // If the category doesn't exist, add it
+    // If the category doesn't exist, add it with a default color
     if (!categories.some(cat => cat.name === point.category)) {
-      handleCategoryAdd(point.category);
+      handleCategoryAdd(point.category, '#9b87f5');
     }
     
     toast.success('Waypoint added successfully', {
@@ -57,7 +58,7 @@ const Index = () => {
     });
   };
 
-  const handleCategoryAdd = (name: string) => {
+  const handleCategoryAdd = (name: string, color: string) => {
     const trimmedName = name.trim();
     if (!trimmedName) return;
     
@@ -71,6 +72,7 @@ const Index = () => {
     const newCategory: Category = {
       id: Math.random().toString(36).substr(2, 9),
       name: trimmedName,
+      color,
     };
     setCategories(prevCategories => [...prevCategories, newCategory]);
     toast.success('Category added successfully', {

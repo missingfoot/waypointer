@@ -8,7 +8,7 @@ interface SidebarProps {
   waypoints: Waypoint[];
   categories: Category[];
   onWaypointDelete: (id: string) => void;
-  onCategoryAdd: (name: string) => void;
+  onCategoryAdd: (name: string, color: string) => void;
   onCategoryDelete: (id: string) => void;
   onToggleAddWaypoint: () => void;
   isAddingWaypoint: boolean;
@@ -23,6 +23,7 @@ interface Waypoint {
 interface Category {
   id: string;
   name: string;
+  color: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -47,6 +48,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       });
     }
     setIsCategoryDialogOpen(true);
+  };
+
+  const getCategoryColor = (categoryName: string) => {
+    const category = categories.find(cat => cat.name === categoryName);
+    return category?.color || '#9b87f5';
   };
 
   return (
@@ -74,9 +80,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 key={waypoint.id}
                 className="flex items-center justify-between p-2 rounded-md bg-muted"
               >
-                <div>
-                  <p className="font-medium">{waypoint.name}</p>
-                  <p className="text-sm text-muted-foreground">{waypoint.category}</p>
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: getCategoryColor(waypoint.category) }}
+                  />
+                  <div>
+                    <p className="font-medium">{waypoint.name}</p>
+                    <p className="text-sm text-muted-foreground">{waypoint.category}</p>
+                  </div>
                 </div>
                 <Button
                   variant="ghost"
@@ -108,7 +120,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 key={category.id}
                 className="flex items-center justify-between p-2 rounded-md bg-muted"
               >
-                <span>{category.name}</span>
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: category.color }}
+                  />
+                  <span>{category.name}</span>
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
