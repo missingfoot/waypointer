@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Upload, ZoomIn, ZoomOut, Move } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { MapGrid } from './map/MapGrid';
+import { MapControls } from './map/MapControls';
 
 interface MapWorkspaceProps {
   onMapUpload: (file: File) => void;
@@ -53,7 +55,11 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     const x = ((e.clientX - rect.left - position.x) / scale / rect.width) * 100;
     const y = ((e.clientY - rect.top - position.y) / scale / rect.height) * 100;
     
-    onWaypointAdd({ x, y });
+    // Round to nearest grid cell (10% intervals)
+    const gridX = Math.round(x / 10) * 10;
+    const gridY = Math.round(y / 10) * 10;
+    
+    onWaypointAdd({ x: gridX, y: gridY });
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -170,6 +176,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                 className="w-full h-full object-contain pointer-events-none"
                 draggable={false}
               />
+              <MapGrid scale={scale} />
               {waypoints.map((waypoint) => (
                 <div
                   key={waypoint.id}
@@ -177,30 +184,13 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                   style={{ 
                     left: `${waypoint.x}%`, 
                     top: `${waypoint.y}%`,
-                    transform: `scale(${1/scale})`, // Counteract the parent scale to maintain size
+                    transform: `scale(${1/scale})`,
                   }}
                   title={waypoint.name}
                 />
               ))}
             </div>
-            <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-              <Button
-                variant="secondary"
-                size="icon"
-                onClick={handleZoomIn}
-                className="h-8 w-8 shadow-lg"
-              >
-                <ZoomIn className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                onClick={handleZoomOut}
-                className="h-8 w-8 shadow-lg"
-              >
-                <ZoomOut className="h-4 w-4" />
-              </Button>
-            </div>
+            <MapControls onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />
           </>
         )}
       </div>
