@@ -131,6 +131,11 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     }));
   };
 
+  const handleZoomReset = () => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+  };
+
   return (
     <div 
       className="flex-1 bg-workspace p-4 h-full"
@@ -202,7 +207,11 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                 />
               ))}
             </div>
-            <MapControls onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />
+            <MapControls 
+              onZoomIn={handleZoomIn} 
+              onZoomOut={handleZoomOut} 
+              onZoomReset={handleZoomReset}
+            />
           </>
         )}
       </div>
