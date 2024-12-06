@@ -96,10 +96,10 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuItem onClick={() => handleSortClick('alphabetical')}>
-              Sort by name {sortBy === 'alphabetical' && (sortDirection === 'asc' ? <ArrowUp className="h-4 w-4 ml-1" /> : <ArrowDown className="h-4 w-4 ml-1" />)}
+              Name {sortBy === 'alphabetical' && (sortDirection === 'asc' ? <ArrowUp className="h-4 w-4 ml-1" /> : <ArrowDown className="h-4 w-4 ml-1" />)}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleSortClick('time')}>
-              Sort by added {sortBy === 'time' && (sortDirection === 'asc' ? <ArrowUp className="h-4 w-4 ml-1" /> : <ArrowDown className="h-4 w-4 ml-1" />)}
+              Time added {sortBy === 'time' && (sortDirection === 'asc' ? <ArrowUp className="h-4 w-4 ml-1" /> : <ArrowDown className="h-4 w-4 ml-1" />)}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
