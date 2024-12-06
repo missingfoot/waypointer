@@ -53,8 +53,7 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
       className="fixed w-64 bg-background border rounded-lg shadow-lg z-50"
       style={{ 
         left: `${position.x}px`, 
-        top: `${position.y}px`,
-        transform: 'translate(-50%, -100%) translateY(-8px)'
+        top: `${position.y}px`
       }}
     >
       <form onSubmit={handleSubmit} className="p-3 space-y-2">
