@@ -51,7 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="w-full border-r border-border bg-card">
+    <div className="w-full bg-card">
       <Tabs defaultValue="waypoints" className="h-full flex flex-col">
         <TabsList className="justify-start px-4 pt-4 pb-2 h-auto bg-transparent border-0 gap-4">
           <TabsTrigger 
