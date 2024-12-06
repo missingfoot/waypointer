@@ -1,43 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MapWorkspace } from '@/components/MapWorkspace';
 import { Sidebar } from '@/components/Sidebar';
 import { TopNav } from '@/components/TopNav';
 import { toast } from 'sonner';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-
-interface Waypoint {
-  id: string;
-  x: number;
-  y: number;
-  name: string;
-  category: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  color: string;
-}
-
-// Predefined colors for categories
-const categoryColors = [
-  '#9b87f5', // Primary Purple
-  '#F97316', // Bright Orange
-  '#0EA5E9', // Ocean Blue
-  '#D946EF', // Magenta Pink
-  '#33C3F0', // Sky Blue
-  '#FEC6A1', // Soft Orange
-  '#E5DEFF', // Soft Purple
-  '#D3E4FD', // Soft Blue
-  '#8B5CF6', // Vivid Purple
-  '#1EAEDB', // Bright Blue
-];
+import { useTheme } from '@/hooks/useTheme';
 
 const Index = () => {
-  const [mapUrl, setMapUrl] = useState<string | null>(null);
-  const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isAddingWaypoint, setIsAddingWaypoint] = useState(false);
+  const [mapUrl, setMapUrl] = React.useState<string | null>(null);
+  const [waypoints, setWaypoints] = React.useState<Array<{
+    id: string;
+    x: number;
+    y: number;
+    name: string;
+    category: string;
+  }>>([]);
+  const [categories, setCategories] = React.useState<Array<{
+    id: string;
+    name: string;
+    color: string;
+  }>>([]);
+  const [isAddingWaypoint, setIsAddingWaypoint] = React.useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleMapUpload = (file: File) => {
     const url = URL.createObjectURL(file);
@@ -48,15 +32,15 @@ const Index = () => {
   };
 
   const handleWaypointAdd = (point: { x: number; y: number; name: string; category: string }) => {
-    const newWaypoint: Waypoint = {
+    const newWaypoint = {
       id: Math.random().toString(36).substr(2, 9),
       ...point,
     };
 
     setWaypoints([...waypoints, newWaypoint]);
     
-    // If the category doesn't exist, add it with a default color
     if (!categories.some(cat => cat.name === point.category)) {
+      const categoryColors = ['#9b87f5', '#F97316', '#0EA5E9', '#D946EF', '#33C3F0', '#FEC6A1', '#E5DEFF', '#D3E4FD', '#8B5CF6', '#1EAEDB'];
       handleCategoryAdd(point.category, categoryColors[categories.length % categoryColors.length]);
     }
     
@@ -83,13 +67,10 @@ const Index = () => {
       return;
     }
     
-    // Use the next color from our predefined colors array
-    const newColor = color || categoryColors[categories.length % categoryColors.length];
-    
-    const newCategory: Category = {
+    const newCategory = {
       id: Math.random().toString(36).substr(2, 9),
       name: trimmedName,
-      color: newColor,
+      color: color,
     };
     setCategories(prevCategories => [...prevCategories, newCategory]);
     toast.success('Category added successfully', {
@@ -109,6 +90,8 @@ const Index = () => {
       <TopNav 
         isAddingWaypoint={isAddingWaypoint}
         onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
       <div className="flex-1 flex overflow-hidden">
         <ResizablePanelGroup direction="horizontal">
