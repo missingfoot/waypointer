@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, ListChecks } from 'lucide-react';
 import { CategoryItem } from './CategoryItem';
 
 interface Category {
@@ -35,17 +35,26 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
           <Plus className="h-4 w-4" />
         </Button>
       </div>
-      <div className="space-y-2">
-        {categories.map((category) => (
-          <CategoryItem
-            key={category.id}
-            id={category.id}
-            name={category.name}
-            color={category.color}
-            onDelete={onCategoryDelete}
-          />
-        ))}
-      </div>
+      {categories.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-[200px] text-center space-y-4 text-muted-foreground">
+          <ListChecks className="w-8 h-8" />
+          <p>
+            Set up categories to organize your waypoints, or add them automatically as you create new waypoints
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {categories.map((category) => (
+            <CategoryItem
+              key={category.id}
+              id={category.id}
+              name={category.name}
+              color={category.color}
+              onDelete={onCategoryDelete}
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 };
