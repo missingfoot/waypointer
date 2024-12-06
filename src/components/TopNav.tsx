@@ -98,12 +98,7 @@ export const TopNav: React.FC<TopNavProps> = ({
             </DropdownMenuItem>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger className="py-3 px-4 text-sm cursor-pointer">
-                <span>Theme</span>
-                {theme === 'dark' ? (
-                  <Moon className="h-4 w-4 ml-2" />
-                ) : (
-                  <Sun className="h-4 w-4 ml-2" />
-                )}
+                <span className="capitalize">{theme} Theme</span>
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
