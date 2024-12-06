@@ -47,3 +47,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom toast positioning */
+:root {
+  --toaster-offset: 1.5rem;
+}
+
+[role="status"][data-sonner-toaster][data-position="top-right"] {
+  top: var(--toaster-offset) !important;
+  right: var(--toaster-offset) !important;
+  left: unset !important;
+  bottom: unset !important;
+}
