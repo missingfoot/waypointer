@@ -118,7 +118,7 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
           Group
         </Button>
       </div>
-      <div className="space-y-4">
+      <div className={`space-y-${groupByCategory ? '4' : '2'}`}>
         {groupByCategory && groupedWaypoints ? (
           groupedWaypoints.map(({ category, color, waypoints }) => (
             <div key={category} className="space-y-2">
