@@ -56,25 +56,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <TabsList className="justify-start px-4 pt-4 pb-2 h-auto bg-transparent border-0">
           <TabsTrigger 
             value="waypoints" 
-            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent px-2"
+            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent"
           >
             Waypoints
           </TabsTrigger>
           <TabsTrigger 
             value="categories" 
-            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent px-2"
+            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent"
           >
             Categories
           </TabsTrigger>
           <TabsTrigger 
             value="design" 
-            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent px-2"
+            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent"
           >
             Design
           </TabsTrigger>
           <TabsTrigger 
             value="settings" 
-            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent px-2"
+            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent"
           >
             Settings
           </TabsTrigger>
