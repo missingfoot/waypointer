@@ -15,7 +15,7 @@ export const useMapControls = () => {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     
-    const newScale = Math.min(scale + 0.1, 3);
+    const newScale = Math.min(scale + 0.25, 4);
     const scaleFactor = (newScale - scale);
     
     setScale(newScale);
@@ -33,7 +33,7 @@ export const useMapControls = () => {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     
-    const newScale = Math.max(scale - 0.1, 0.5);
+    const newScale = Math.max(scale - 0.25, 0.5);
     const scaleFactor = (scale - newScale);
     
     setScale(newScale);
