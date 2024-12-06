@@ -1,6 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin, Move } from 'lucide-react';
+import { MapPin, Move, Home, ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface TopNavProps {
   isAddingWaypoint: boolean;
@@ -25,9 +31,31 @@ export const TopNav: React.FC<TopNavProps> = ({
 
   return (
     <div className="h-14 border-b border-border px-4 flex items-center bg-card">
-      <Button variant="ghost">
-        Dashboard
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon">
+          <Home className="h-4 w-4" />
+        </Button>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="gap-2">
+              My Project
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem>
+              Rename Project
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              Project Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              Duplicate Project
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       
       <div className="flex-1 flex justify-center gap-2">
         <Button 
