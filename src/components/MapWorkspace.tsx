@@ -31,6 +31,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -45,15 +46,18 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isAddingWaypoint || !mapUrl || isDragging) return;
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    const rect = mapContainerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    // Calculate the click position relative to the transformed container
+    const x = ((e.clientX - rect.left - position.x) / scale / rect.width) * 100;
+    const y = ((e.clientY - rect.top - position.y) / scale / rect.height) * 100;
     
     onWaypointAdd({ x, y });
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return; // Only left click
+    if (e.button !== 0) return;
     setIsDragging(true);
     setDragStart({
       x: e.clientX - position.x,
@@ -74,11 +78,39 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   };
 
   const handleZoomIn = () => {
-    setScale(prev => Math.min(prev + 0.1, 3));
+    if (!containerRef.current) return;
+    
+    const container = containerRef.current;
+    const rect = container.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const newScale = Math.min(scale + 0.1, 3);
+    const scaleFactor = (newScale - scale);
+    
+    setScale(newScale);
+    setPosition(prev => ({
+      x: prev.x - (centerX * scaleFactor),
+      y: prev.y - (centerY * scaleFactor)
+    }));
   };
 
   const handleZoomOut = () => {
-    setScale(prev => Math.max(prev - 0.1, 0.5));
+    if (!containerRef.current) return;
+    
+    const container = containerRef.current;
+    const rect = container.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const newScale = Math.max(scale - 0.1, 0.5);
+    const scaleFactor = (scale - newScale);
+    
+    setScale(newScale);
+    setPosition(prev => ({
+      x: prev.x + (centerX * scaleFactor),
+      y: prev.y + (centerY * scaleFactor)
+    }));
   };
 
   return (
@@ -124,9 +156,10 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
         ) : (
           <>
             <div
+              ref={mapContainerRef}
               style={{
                 transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-                transformOrigin: '0 0',
+                transformOrigin: '50% 50%',
                 transition: isDragging ? 'none' : 'transform 0.1s ease-out'
               }}
               className="absolute inset-0 bg-white"
@@ -144,6 +177,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                   style={{ 
                     left: `${waypoint.x}%`, 
                     top: `${waypoint.y}%`,
+                    transform: `scale(${1/scale})`, // Counteract the parent scale to maintain size
                   }}
                   title={waypoint.name}
                 />
