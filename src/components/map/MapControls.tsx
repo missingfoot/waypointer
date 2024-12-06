@@ -13,18 +13,25 @@ export const MapControls: React.FC<MapControlsProps> = ({
   onZoomOut,
   onZoomReset,
 }) => {
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
   return (
     <div 
       className="absolute bottom-4 right-4 flex flex-col gap-0.5 bg-background rounded-lg shadow-lg border border-border overflow-hidden"
-      onMouseDown={(e) => e.stopPropagation()}
-      onClick={(e) => e.stopPropagation()}
-      onDoubleClick={(e) => e.stopPropagation()}
+      onMouseDown={stopPropagation}
+      onClick={stopPropagation}
+      onDoubleClick={stopPropagation}
+      onMouseUp={stopPropagation}
+      onMouseMove={stopPropagation}
     >
       <Button
         variant="ghost"
         size="icon"
         onClick={(e) => {
-          e.stopPropagation();
+          stopPropagation(e);
           onZoomIn();
         }}
         className="h-8 w-8 rounded-none hover:bg-accent"
@@ -35,7 +42,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
         variant="ghost"
         size="icon"
         onClick={(e) => {
-          e.stopPropagation();
+          stopPropagation(e);
           onZoomReset();
         }}
         className="h-8 w-8 rounded-none hover:bg-accent border-y border-border"
@@ -46,7 +53,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
         variant="ghost"
         size="icon"
         onClick={(e) => {
-          e.stopPropagation();
+          stopPropagation(e);
           onZoomOut();
         }}
         className="h-8 w-8 rounded-none hover:bg-accent"
