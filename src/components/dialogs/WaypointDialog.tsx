@@ -36,6 +36,7 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
       // Reset form when dialog closes
       setName('');
       setCategory('');
+      setShowSuggestions(false);
     }
   }, [open]);
 
@@ -57,9 +58,6 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
 
   const handleCategoryChange = (value: string) => {
     setCategory(value);
-    if (!categories.some(cat => cat.name.toLowerCase() === value.toLowerCase())) {
-      setShowSuggestions(true);
-    }
   };
 
   const filteredCategories = categories.filter(cat => 
@@ -91,6 +89,10 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
             value={category}
             onChange={(e) => handleCategoryChange(e.target.value)}
             onFocus={() => setShowSuggestions(true)}
+            onBlur={() => {
+              // Delay hiding suggestions to allow for click events
+              setTimeout(() => setShowSuggestions(false), 200);
+            }}
             placeholder="Type category"
             className="h-8 text-sm"
             autoComplete="off"
