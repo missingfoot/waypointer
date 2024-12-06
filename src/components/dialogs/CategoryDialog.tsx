@@ -59,7 +59,7 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
       style={{ 
         left: `${position.x}px`, 
         top: `${position.y}px`,
-        transform: 'translateX(-90%)' // This shifts the dialog to appear from the right
+        transform: 'translate(8px, -50%)' // This positions the dialog to the right of the button
       }}
       onKeyDown={handleKeyDown}
     >
