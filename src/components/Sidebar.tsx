@@ -84,7 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className="absolute inset-y-2 left-2 w-1.5 rounded-[9999px]"
                   style={{ backgroundColor: getCategoryColor(waypoint.category) }}
                 />
-                <div className="flex items-center gap-2 pl-8">
+                <div className="flex items-center gap-2 pl-4">
                   <div>
                     <p className="font-medium">{waypoint.name}</p>
                     <p className="text-sm text-muted-foreground">{waypoint.category}</p>
@@ -124,7 +124,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className="absolute inset-y-2 left-2 w-1.5 rounded-[9999px]"
                   style={{ backgroundColor: category.color }}
                 />
-                <div className="flex items-center gap-2 pl-8">
+                <div className="flex items-center gap-2 pl-4">
                   <span>{category.name}</span>
                 </div>
                 <Button
