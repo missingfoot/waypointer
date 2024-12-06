@@ -39,16 +39,15 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
       )}
       
       {categories.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-[200px] text-center space-y-4 text-muted-foreground">
-          <ListChecks className="w-8 h-8" />
-          <p>
+        <div className="flex flex-col items-start pt-8 space-y-4 text-left">
+          <ListChecks className="w-8 h-8 text-muted-foreground" />
+          <p className="text-muted-foreground">
             Set up categories to organize your waypoints, or add them automatically as you create new waypoints
           </p>
           <Button
             ref={addButtonRef}
             onClick={onAddClick}
             variant="outline"
-            className="mt-4"
           >
             <Plus className="h-4 w-4 mr-1" />
             Add
