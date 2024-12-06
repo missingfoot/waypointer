@@ -62,8 +62,8 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     const deltaX = Math.abs(e.clientX - mouseStartPosition.x);
     const deltaY = Math.abs(e.clientY - mouseStartPosition.y);
     
-    // Consider it a move if the mouse has moved more than 5 pixels in any direction
-    if (deltaX > 5 || deltaY > 5) {
+    // Consider it a move if the mouse has moved more than 15 pixels in any direction
+    if (deltaX > 15 || deltaY > 15) {
       setHasMouseMoved(true);
     }
     handleMouseMove(e);
