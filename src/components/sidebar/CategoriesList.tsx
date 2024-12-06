@@ -79,13 +79,13 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
 
   return (
     <>
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-center mb-2 -mx-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               size="sm"
               variant="ghost"
-              className="h-8"
+              className="h-8 px-3"
             >
               {getSortLabel()}
               {sortDirection === 'asc' ? (
@@ -110,7 +110,7 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
           size="sm"
           variant="ghost"
           onClick={onAddClick}
-          className="h-8"
+          className="h-8 px-3"
         >
           <Plus className="h-4 w-4 mr-1" />
           Add
