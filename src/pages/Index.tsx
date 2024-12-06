@@ -30,19 +30,10 @@ const Index = () => {
     toast.success('Map uploaded successfully');
   };
 
-  const handleWaypointAdd = (point: { x: number; y: number }) => {
-    const name = prompt('Enter waypoint name:');
-    if (!name) return;
-
-    const category = prompt('Enter category:');
-    if (!category) return;
-
+  const handleWaypointAdd = (point: { x: number; y: number; name: string; category: string }) => {
     const newWaypoint: Waypoint = {
       id: Math.random().toString(36).substr(2, 9),
-      x: point.x,
-      y: point.y,
-      name,
-      category,
+      ...point,
     };
 
     setWaypoints([...waypoints, newWaypoint]);
@@ -55,6 +46,11 @@ const Index = () => {
   };
 
   const handleCategoryAdd = (name: string) => {
+    if (categories.some(cat => cat.name === name)) {
+      toast.error('Category already exists');
+      return;
+    }
+    
     const newCategory: Category = {
       id: Math.random().toString(36).substr(2, 9),
       name,
@@ -95,6 +91,8 @@ const Index = () => {
               waypoints={waypoints}
               onWaypointAdd={handleWaypointAdd}
               isAddingWaypoint={isAddingWaypoint}
+              categories={categories}
+              onCategoryAdd={handleCategoryAdd}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

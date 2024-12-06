@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { MapUploadInterface } from './map/MapUploadInterface';
 import { MapContent } from './map/MapContent';
 import { useMapControls } from '@/hooks/useMapControls';
+import { WaypointDialog } from './dialogs/WaypointDialog';
 
 interface MapWorkspaceProps {
   onMapUpload: (file: File) => void;
@@ -14,8 +15,10 @@ interface MapWorkspaceProps {
     name: string;
     category: string;
   }>;
-  onWaypointAdd: (point: { x: number; y: number }) => void;
+  onWaypointAdd: (point: { x: number; y: number; name: string; category: string }) => void;
   isAddingWaypoint: boolean;
+  categories: Array<{ id: string; name: string }>;
+  onCategoryAdd: (name: string) => void;
 }
 
 export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
@@ -24,11 +27,15 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   waypoints,
   onWaypointAdd,
   isAddingWaypoint,
+  categories,
+  onCategoryAdd,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [hasMouseMoved, setHasMouseMoved] = useState(false);
   const [mouseStartPosition, setMouseStartPosition] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null);
   
   const {
     scale,
@@ -93,9 +100,17 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     const boundedX = Math.max(0, Math.min(100, gridX));
     const boundedY = Math.max(0, Math.min(100, gridY));
 
-    onWaypointAdd({ x: boundedX, y: boundedY });
+    setPendingPoint({ x: boundedX, y: boundedY });
+    setDialogOpen(true);
     setHasMouseMoved(false);
     setIsPanning(false);
+  };
+
+  const handleWaypointSubmit = (name: string, category: string) => {
+    if (pendingPoint) {
+      onWaypointAdd({ ...pendingPoint, name, category });
+      setPendingPoint(null);
+    }
   };
 
   return (
@@ -137,6 +152,13 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
           </div>
         )}
       </div>
+      <WaypointDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleWaypointSubmit}
+        categories={categories}
+        onCategoryAdd={onCategoryAdd}
+      />
     </div>
   );
 };
