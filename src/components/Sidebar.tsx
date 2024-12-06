@@ -1,8 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { CategoryDialog } from './dialogs/CategoryDialog';
 import { WaypointsList } from './sidebar/WaypointsList';
 import { CategoriesList } from './sidebar/CategoriesList';
+import { TabsHeader } from './sidebar/TabsHeader';
+import { SettingsTab } from './sidebar/SettingsTab';
 
 interface SidebarProps {
   waypoints: Waypoint[];
@@ -53,26 +55,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div className="w-full bg-card">
       <Tabs defaultValue="waypoints" className="h-full flex flex-col">
-        <TabsList className="justify-start px-4 pt-4 pb-2 h-auto bg-transparent border-0 gap-4">
-          <TabsTrigger 
-            value="waypoints" 
-            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent relative after:absolute after:inset-0 after:-m-2 after:cursor-pointer"
-          >
-            Waypoints
-          </TabsTrigger>
-          <TabsTrigger 
-            value="categories" 
-            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent relative after:absolute after:inset-0 after:-m-2 after:cursor-pointer"
-          >
-            Categories
-          </TabsTrigger>
-          <TabsTrigger 
-            value="settings" 
-            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent relative after:absolute after:inset-0 after:-m-2 after:cursor-pointer"
-          >
-            Settings
-          </TabsTrigger>
-        </TabsList>
+        <TabsHeader />
 
         <TabsContent value="waypoints" className="flex-1 px-4 py-4 space-y-4">
           <WaypointsList
@@ -91,9 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="settings" className="flex-1 p-4">
-          <p className="text-muted-foreground">Additional settings coming soon...</p>
-        </TabsContent>
+        <SettingsTab />
       </Tabs>
 
       <CategoryDialog
