@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface WaypointDialogProps {
   open: boolean;
@@ -45,57 +44,66 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
     cat.name.toLowerCase().includes(category.toLowerCase())
   );
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add Waypoint</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+    <div className="absolute top-4 left-4 w-64 bg-background border rounded-lg shadow-lg z-50">
+      <form onSubmit={handleSubmit} className="p-3 space-y-2">
+        <div className="space-y-1">
+          <Label htmlFor="name" className="text-xs">Name</Label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Waypoint name"
+            className="h-8 text-sm"
+          />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Category</Label>
+          <div className="relative">
             <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter waypoint name"
+              value={category}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              onFocus={() => setShowSuggestions(true)}
+              placeholder="Type category"
+              className="h-8 text-sm"
             />
+            {showSuggestions && categories.length > 0 && (
+              <div className="absolute w-full mt-1 bg-popover border rounded-md shadow-md z-50 max-h-[120px] overflow-y-auto">
+                {filteredCategories.map((cat) => (
+                  <div
+                    key={cat.id}
+                    className="px-2 py-1 text-sm hover:bg-accent cursor-pointer"
+                    onClick={() => {
+                      setCategory(cat.name);
+                      setShowSuggestions(false);
+                    }}
+                  >
+                    {cat.name}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="space-y-2">
-            <Label>Category</Label>
-            <div className="relative">
-              <Input
-                value={category}
-                onChange={(e) => handleCategoryChange(e.target.value)}
-                onFocus={() => setShowSuggestions(true)}
-                placeholder="Type or select category"
-              />
-              {showSuggestions && categories.length > 0 && (
-                <div className="absolute w-full mt-1 bg-popover border rounded-md shadow-md z-50 max-h-[200px] overflow-y-auto">
-                  {filteredCategories.map((cat) => (
-                    <div
-                      key={cat.id}
-                      className="px-4 py-2 hover:bg-accent cursor-pointer"
-                      onClick={() => {
-                        setCategory(cat.name);
-                        setShowSuggestions(false);
-                      }}
-                    >
-                      {cat.name}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">Add Waypoint</Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+        <div className="flex justify-end space-x-2 pt-1">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            className="h-7 text-xs px-2"
+          >
+            Cancel
+          </Button>
+          <Button 
+            type="submit"
+            className="h-7 text-xs px-2"
+          >
+            Add
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
