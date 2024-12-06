@@ -67,12 +67,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             Categories
           </TabsTrigger>
           <TabsTrigger 
-            value="design" 
-            className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent"
-          >
-            Design
-          </TabsTrigger>
-          <TabsTrigger 
             value="settings" 
             className="data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:font-medium data-[state=inactive]:text-muted-foreground bg-transparent"
           >
@@ -95,10 +89,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onAddClick={handleAddCategoryClick}
             addButtonRef={addButtonRef}
           />
-        </TabsContent>
-
-        <TabsContent value="design" className="flex-1 p-4">
-          <p className="text-muted-foreground">Design settings coming soon...</p>
         </TabsContent>
 
         <TabsContent value="settings" className="flex-1 p-4">
