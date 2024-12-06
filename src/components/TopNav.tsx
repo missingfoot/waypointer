@@ -71,7 +71,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           variant={isAddingWaypoint ? "default" : "ghost"} 
           size="icon"
           onClick={handleWaypointClick}
-          className={`w-9 h-9 ${isAddingWaypoint ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+          className={`w-9 h-9 ${isAddingWaypoint ? 'bg-blue-500 hover:bg-blue-600 [&>svg]:text-white dark:[&>svg]:text-white' : ''}`}
         >
           <MapPin className="h-4 w-4" />
         </Button>
@@ -79,7 +79,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           variant={isMoving ? "default" : "ghost"}
           size="icon"
           onClick={handleMoveClick}
-          className={`w-9 h-9 ${isMoving ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+          className={`w-9 h-9 ${isMoving ? 'bg-blue-500 hover:bg-blue-600 [&>svg]:text-white dark:[&>svg]:text-white' : ''}`}
         >
           <Move className="h-4 w-4" />
         </Button>

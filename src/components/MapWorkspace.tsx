@@ -141,7 +141,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
       <div 
         ref={containerRef}
         className={`w-full h-full relative rounded-lg shadow-sm border border-border overflow-hidden select-none ${
-          mapUrl ? 'bg-[repeating-linear-gradient(45deg,#fafad2,#fafad2_10px,#fff_10px,#fff_20px)]' : 'bg-white'
+          mapUrl ? 'bg-[repeating-linear-gradient(45deg,#fafad2,#fafad2_10px,#fff_10px,#fff_20px)] dark:bg-[repeating-linear-gradient(45deg,#1a1f2c,#1a1f2c_10px,#2d3748_10px,#2d3748_20px)]' : 'bg-white dark:bg-gray-900'
         } ${getCursorStyle()}`}
         onMouseDown={handleMapMouseDown}
         onMouseMove={handleMapMouseMove}
