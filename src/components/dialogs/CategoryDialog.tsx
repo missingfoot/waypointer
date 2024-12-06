@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 interface CategoryDialogProps {
   open: boolean;
@@ -59,41 +58,34 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
       className="fixed w-64 bg-background border rounded-lg shadow-lg z-50"
       style={{ 
         left: `${position.x}px`, 
-        top: `${position.y}px`
+        top: `${position.y}px`,
+        transform: 'translateX(-90%)' // This shifts the dialog to appear from the right
       }}
       onKeyDown={handleKeyDown}
     >
       <form onSubmit={handleSubmit} className="p-3 space-y-2">
-        <div className="space-y-1">
-          <Label htmlFor="name">Name</Label>
+        <Input
+          ref={nameInputRef}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Category name"
+          className="h-8 text-sm"
+          autoComplete="off"
+        />
+        <div className="flex gap-2">
           <Input
-            id="name"
-            ref={nameInputRef}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Category name"
-            className="h-8 text-sm"
-            autoComplete="off"
+            type="color"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            className="h-8 w-16 p-1 cursor-pointer"
           />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="color">Color</Label>
-          <div className="flex gap-2">
-            <Input
-              id="color"
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="h-8 w-16 p-1 cursor-pointer"
-            />
-            <Input
-              type="text"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="h-8 text-sm flex-1"
-              placeholder="#000000"
-            />
-          </div>
+          <Input
+            type="text"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            className="h-8 text-sm flex-1"
+            placeholder="#000000"
+          />
         </div>
         <div className="flex justify-end space-x-2 pt-1">
           <Button 
