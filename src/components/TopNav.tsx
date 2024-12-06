@@ -11,7 +11,7 @@ export const TopNav: React.FC<TopNavProps> = ({
   isAddingWaypoint,
   onToggleAddWaypoint,
 }) => {
-  const [isMoving, setIsMoving] = React.useState(false);
+  const [isMoving, setIsMoving] = React.useState(true); // Set to true by default
 
   const handleWaypointClick = () => {
     if (isMoving) setIsMoving(false);
