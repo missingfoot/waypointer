@@ -1,24 +1,21 @@
-import React, { useState, useRef } from 'react';
-import { Upload } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useRef } from 'react';
 import { toast } from 'sonner';
-import { MapGrid } from './map/MapGrid';
-import { MapControls } from './map/MapControls';
+import { MapUploadInterface } from './map/MapUploadInterface';
+import { MapContent } from './map/MapContent';
+import { useMapControls } from '@/hooks/useMapControls';
 
 interface MapWorkspaceProps {
   onMapUpload: (file: File) => void;
   mapUrl: string | null;
-  waypoints: Waypoint[];
+  waypoints: Array<{
+    id: string;
+    x: number;
+    y: number;
+    name: string;
+    category: string;
+  }>;
   onWaypointAdd: (point: { x: number; y: number }) => void;
   isAddingWaypoint: boolean;
-}
-
-interface Waypoint {
-  id: string;
-  x: number;
-  y: number;
-  name: string;
-  category: string;
 }
 
 export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
@@ -28,12 +25,19 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   onWaypointAdd,
   isAddingWaypoint,
 }) => {
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const {
+    scale,
+    position,
+    isDragging,
+    containerRef,
+    handleZoomIn,
+    handleZoomOut,
+    handleZoomReset,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+  } = useMapControls();
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -51,89 +55,18 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     const rect = mapContainerRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    // Calculate the click position relative to the map container
     const x = (e.clientX - rect.left);
     const y = (e.clientY - rect.top);
-
-    // Adjust for current pan position and scale
     const adjustedX = (x - position.x) / scale;
     const adjustedY = (y - position.y) / scale;
-
-    // Convert to percentage
     const percentX = (adjustedX / rect.width) * 100;
     const percentY = (adjustedY / rect.height) * 100;
-
-    // Round to nearest grid cell (10% intervals)
     const gridX = Math.round(percentX / 10) * 10;
     const gridY = Math.round(percentY / 10) * 10;
-
-    // Ensure coordinates are within bounds (0-100)
     const boundedX = Math.max(0, Math.min(100, gridX));
     const boundedY = Math.max(0, Math.min(100, gridY));
 
     onWaypointAdd({ x: boundedX, y: boundedY });
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return;
-    setIsDragging(true);
-    setDragStart({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y
-    });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    setPosition({
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y
-    });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleZoomIn = () => {
-    if (!containerRef.current) return;
-    
-    const container = containerRef.current;
-    const rect = container.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    const newScale = Math.min(scale + 0.1, 3);
-    const scaleFactor = (newScale - scale);
-    
-    setScale(newScale);
-    setPosition(prev => ({
-      x: prev.x - (centerX * scaleFactor),
-      y: prev.y - (centerY * scaleFactor)
-    }));
-  };
-
-  const handleZoomOut = () => {
-    if (!containerRef.current) return;
-    
-    const container = containerRef.current;
-    const rect = container.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    const newScale = Math.max(scale - 0.1, 0.5);
-    const scaleFactor = (scale - newScale);
-    
-    setScale(newScale);
-    setPosition(prev => ({
-      x: prev.x + (centerX * scaleFactor),
-      y: prev.y + (centerY * scaleFactor)
-    }));
-  };
-
-  const handleZoomReset = () => {
-    setScale(1);
-    setPosition({ x: 0, y: 0 });
   };
 
   return (
@@ -156,63 +89,20 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
         onMouseLeave={handleMouseUp}
       >
         {!mapUrl ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted-foreground p-4">
-            <Upload className="w-12 h-12" />
-            <p className="text-center">Drag and drop your map image here or click to upload</p>
-            <Button
-              variant="outline"
-              onClick={() => document.getElementById('map-upload')?.click()}
-            >
-              Upload Map
-            </Button>
-            <input
-              id="map-upload"
-              type="file"
-              className="hidden"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) onMapUpload(file);
-              }}
-            />
-          </div>
+          <MapUploadInterface onMapUpload={onMapUpload} />
         ) : (
-          <>
-            <div
-              ref={mapContainerRef}
-              style={{
-                transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-                transformOrigin: '50% 50%',
-                transition: isDragging ? 'none' : 'transform 0.1s ease-out'
-              }}
-              className="absolute inset-0 bg-white"
-            >
-              <img 
-                src={mapUrl} 
-                alt="Venue Map" 
-                className="w-full h-full object-contain pointer-events-none"
-                draggable={false}
-              />
-              <MapGrid scale={scale} />
-              {waypoints.map((waypoint) => (
-                <div
-                  key={waypoint.id}
-                  className="absolute w-4 h-4 -ml-2 -mt-2 bg-blue-500 rounded-full border-2 border-white shadow-md cursor-pointer animate-fade-in"
-                  style={{ 
-                    left: `${waypoint.x}%`, 
-                    top: `${waypoint.y}%`,
-                    transform: `scale(${1/scale})`,
-                  }}
-                  title={waypoint.name}
-                />
-              ))}
-            </div>
-            <MapControls 
-              onZoomIn={handleZoomIn} 
-              onZoomOut={handleZoomOut} 
+          <div ref={mapContainerRef}>
+            <MapContent
+              mapUrl={mapUrl}
+              position={position}
+              scale={scale}
+              isDragging={isDragging}
+              waypoints={waypoints}
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
               onZoomReset={handleZoomReset}
             />
-          </>
+          </div>
         )}
       </div>
     </div>
