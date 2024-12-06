@@ -77,7 +77,7 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
             type="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}
-            className="h-8 w-16 p-1 cursor-pointer"
+            className="h-8 w-8 p-1 cursor-pointer"
           />
           <Input
             type="text"
