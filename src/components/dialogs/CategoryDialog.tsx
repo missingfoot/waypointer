@@ -59,7 +59,7 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
       style={{ 
         left: `${position.x}px`, 
         top: `${position.y}px`,
-        transform: 'translate(16px, -40%)' // Adjusted to move more right and slightly down
+        transform: 'translate(16px, -40%)'
       }}
       onKeyDown={handleKeyDown}
     >
@@ -77,7 +77,7 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
             type="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}
-            className="h-8 w-8 p-1 cursor-pointer"
+            className="h-8 w-8 p-0 cursor-pointer"
           />
           <Input
             type="text"
