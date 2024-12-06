@@ -9,6 +9,8 @@ interface Waypoint {
   id: string;
   name: string;
   category: string;
+  x: number;
+  y: number;
 }
 
 interface Category {
@@ -135,6 +137,8 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
                   name={waypoint.name}
                   category={waypoint.category}
                   categoryColor={getCategoryColor(waypoint.category)}
+                  x={waypoint.x}
+                  y={waypoint.y}
                   onDelete={onWaypointDelete}
                 />
               ))}
@@ -148,6 +152,8 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
               name={waypoint.name}
               category={waypoint.category}
               categoryColor={getCategoryColor(waypoint.category)}
+              x={waypoint.x}
+              y={waypoint.y}
               onDelete={onWaypointDelete}
             />
           ))

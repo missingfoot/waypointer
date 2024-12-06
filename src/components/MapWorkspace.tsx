@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { MapUploadInterface } from './map/MapUploadInterface';
-import { MapContent } from './map/MapContent';
-import { useMapControls } from '@/hooks/useMapControls';
+import { MapInteractionHandler } from './map/MapInteractionHandler';
+import { DebugOverlay } from './map/DebugOverlay';
 import { WaypointDialog } from './dialogs/WaypointDialog';
 
 interface MapWorkspaceProps {
@@ -10,8 +10,8 @@ interface MapWorkspaceProps {
   mapUrl: string | null;
   waypoints: Array<{
     id: string;
-    x: number;
-    y: number;
+    x: number;  // percentage (0-100)
+    y: number;  // percentage (0-100)
     name: string;
     category: string;
   }>;
@@ -19,6 +19,7 @@ interface MapWorkspaceProps {
   isAddingWaypoint: boolean;
   categories: Array<{ id: string; name: string; color: string }>;
   onCategoryAdd: (name: string, color: string) => void;
+  isDebugMode: boolean;
 }
 
 export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
@@ -29,27 +30,25 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   isAddingWaypoint,
   categories,
   onCategoryAdd,
+  isDebugMode,
 }) => {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [hasMouseMoved, setHasMouseMoved] = useState(false);
-  const [mouseStartPosition, setMouseStartPosition] = useState({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null);
-  const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
-  
-  const {
-    scale,
-    position,
-    isDragging,
-    containerRef,
-    handleZoomIn,
-    handleZoomOut,
-    handleZoomReset,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-  } = useMapControls();
+  const [dialogPosition, setDialogPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [clickHistory, setClickHistory] = useState<Array<{
+    id: number;
+    pixels: { x: number; y: number };
+    percent: { x: number; y: number };
+    scale: number;
+  }>>([]);
+  const [waypointHistory, setWaypointHistory] = useState<Array<{
+    id: number;
+    pixels: { x: number; y: number };
+    percent: { x: number; y: number };
+    scale: number;
+  }>>([]);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -63,120 +62,107 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     }
   };
 
-  const handleMapMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    setHasMouseMoved(false);
-    setMouseStartPosition({ x: e.clientX, y: e.clientY });
-    handleMouseDown(e);
-    if (!isAddingWaypoint) {
-      setIsPanning(true);
-    }
+  const handleImageLoad = (dimensions: { width: number; height: number }) => {
+    setImageDimensions(dimensions);
   };
 
-  const handleMapMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const deltaX = Math.abs(e.clientX - mouseStartPosition.x);
-    const deltaY = Math.abs(e.clientY - mouseStartPosition.y);
-    
-    if (deltaX > 5 || deltaY > 5) {
-      setHasMouseMoved(true);
-      if (!isAddingWaypoint && isDragging) {
-        setIsPanning(true);
-      }
-    }
-    handleMouseMove(e);
+  const handleDebugReset = () => {
+    setClickHistory([]);
+    setWaypointHistory([]);
   };
 
-  const handleMapMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
-    handleMouseUp();
-    
-    if (!isAddingWaypoint || !mapUrl || hasMouseMoved) {
-      setIsPanning(false);
-      setHasMouseMoved(false);
-      return;
+  const handleCoordinateSelect = (normalized: { x: number; y: number }, screenPosition: { x: number; y: number }) => {
+    if (isDebugMode) {
+      setClickHistory(prev => [...prev, {
+        id: prev.length + 1,
+        pixels: screenPosition,
+        percent: {
+          x: normalized.x * 100,
+          y: normalized.y * 100
+        },
+        scale: 1
+      }]);
     }
 
-    const rect = mapContainerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const x = (e.clientX - rect.left);
-    const y = (e.clientY - rect.top);
-    const adjustedX = (x - position.x) / scale;
-    const adjustedY = (y - position.y) / scale;
-    const percentX = (adjustedX / rect.width) * 100;
-    const percentY = (adjustedY / rect.height) * 100;
-    const gridX = Math.round(percentX / 10) * 10;
-    const gridY = Math.round(percentY / 10) * 10;
-    const boundedX = Math.max(0, Math.min(100, gridX));
-    const boundedY = Math.max(0, Math.min(100, gridY));
-
-    setPendingPoint({ x: boundedX, y: boundedY });
-    setDialogPosition({ x: e.clientX, y: e.clientY });
+    setPendingPoint(normalized);
+    setDialogPosition(screenPosition);
     setDialogOpen(true);
-    setHasMouseMoved(false);
-    setIsPanning(false);
   };
 
   const handleWaypointSubmit = (name: string, category: string) => {
-    if (pendingPoint) {
-      onWaypointAdd({ ...pendingPoint, name, category });
-      setPendingPoint(null);
-    }
-  };
+    if (!pendingPoint) return;
 
-  const getCursorStyle = () => {
-    if (!mapUrl) return '';
-    if (isDragging) return 'cursor-grabbing';
-    if (isAddingWaypoint) {
-      if (isPanning) return 'cursor-grabbing';
-      return 'cursor-crosshair';
+    const screenPosition = {
+      x: pendingPoint.x * (imageDimensions?.width || 0),
+      y: pendingPoint.y * (imageDimensions?.height || 0)
+    };
+
+    if (isDebugMode) {
+      setWaypointHistory(prev => [...prev, {
+        id: prev.length + 1,
+        pixels: screenPosition,
+        percent: {
+          x: pendingPoint.x * 100,
+          y: pendingPoint.y * 100
+        },
+        scale: 1
+      }]);
     }
-    return 'cursor-grab';
+
+    onWaypointAdd({
+      x: pendingPoint.x * 100,
+      y: pendingPoint.y * 100,
+      name,
+      category
+    });
+    setPendingPoint(null);
+    setDialogOpen(false);
   };
 
   return (
     <div 
-      className="flex-1 bg-workspace p-4 h-full"
+      className="flex-1 bg-workspace h-full"
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
-      <div 
-        ref={containerRef}
-        className={`w-full h-full relative rounded-lg shadow-sm border border-border overflow-hidden select-none ${
-          mapUrl ? 'bg-[repeating-linear-gradient(45deg,#fafad2,#fafad2_10px,#fff_10px,#fff_20px)] dark:bg-[repeating-linear-gradient(45deg,#1a1f2c,#1a1f2c_10px,#2d3748_10px,#2d3748_20px)]' : 'bg-white dark:bg-gray-900'
-        } ${getCursorStyle()}`}
-        onMouseDown={handleMapMouseDown}
-        onMouseMove={handleMapMouseMove}
-        onMouseUp={handleMapMouseUp}
-        onMouseLeave={() => {
-          handleMouseUp();
-          setIsPanning(false);
-          setHasMouseMoved(false);
-        }}
-      >
-        {!mapUrl ? (
-          <MapUploadInterface onMapUpload={onMapUpload} />
-        ) : (
-          <div ref={mapContainerRef}>
-            <MapContent
-              mapUrl={mapUrl}
-              position={position}
-              scale={scale}
-              isDragging={isDragging}
-              waypoints={waypoints}
-              onZoomIn={handleZoomIn}
-              onZoomOut={handleZoomOut}
-              onZoomReset={handleZoomReset}
+      {!mapUrl ? (
+        <MapUploadInterface onMapUpload={onMapUpload} />
+      ) : (
+        <>
+          <MapInteractionHandler
+            mapUrl={mapUrl}
+            waypoints={waypoints.map(wp => ({
+              ...wp,
+              x: wp.x / 100,
+              y: wp.y / 100
+            }))}
+            isAddingWaypoint={isAddingWaypoint}
+            onCoordinateSelect={handleCoordinateSelect}
+            imageRef={imageRef}
+            onImageLoad={handleImageLoad}
+          />
+          {isDebugMode && (
+            <DebugOverlay
+              cursorPosition={{ x: 0, y: 0 }}
+              cursorPercent={{ x: 0, y: 0 }}
+              position={{ x: 0, y: 0 }}
+              scale={1}
+              imageDimensions={imageDimensions}
+              clickHistory={clickHistory}
+              waypointHistory={waypointHistory}
+              onReset={handleDebugReset}
             />
-          </div>
-        )}
-      </div>
-      <WaypointDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        onSubmit={handleWaypointSubmit}
-        categories={categories}
-        onCategoryAdd={onCategoryAdd}
-        position={dialogPosition}
-      />
+          )}
+          <WaypointDialog
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+            onSubmit={handleWaypointSubmit}
+            categories={categories}
+            onCategoryAdd={onCategoryAdd}
+            position={dialogPosition}
+          />
+        </>
+      )}
     </div>
   );
 };

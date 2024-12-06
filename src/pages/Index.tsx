@@ -21,6 +21,7 @@ const Index = () => {
     color: string;
   }>>([]);
   const [isAddingWaypoint, setIsAddingWaypoint] = React.useState(false);
+  const [isDebugMode, setIsDebugMode] = React.useState(false);
   const { theme, setTheme } = useTheme();
 
   const handleMapUpload = (file: File) => {
@@ -92,6 +93,8 @@ const Index = () => {
         onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
         theme={theme as 'light' | 'dark' | 'system'}
         onToggleTheme={(newTheme) => setTheme(newTheme)}
+        isDebugMode={isDebugMode}
+        setIsDebugMode={setIsDebugMode}
       />
       <div className="flex-1 flex overflow-hidden">
         <ResizablePanelGroup direction="horizontal">
@@ -104,6 +107,8 @@ const Index = () => {
               onCategoryDelete={handleCategoryDelete}
               onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
               isAddingWaypoint={isAddingWaypoint}
+              isDebugMode={isDebugMode}
+              setIsDebugMode={setIsDebugMode}
             />
           </ResizablePanel>
           <ResizableHandle />
@@ -116,6 +121,7 @@ const Index = () => {
               isAddingWaypoint={isAddingWaypoint}
               categories={categories}
               onCategoryAdd={handleCategoryAdd}
+              isDebugMode={isDebugMode}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

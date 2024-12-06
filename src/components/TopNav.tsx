@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin, Move, Home, ChevronDown, Sun, Moon, Laptop } from 'lucide-react';
+import { MapPin, Move, Home, ChevronDown, Sun, Moon, Laptop, Bug } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,8 @@ interface TopNavProps {
   onToggleAddWaypoint: () => void;
   theme: 'light' | 'dark' | 'system';
   onToggleTheme: (theme: 'light' | 'dark' | 'system') => void;
+  isDebugMode: boolean;
+  setIsDebugMode: (enabled: boolean) => void;
 }
 
 export const TopNav: React.FC<TopNavProps> = ({
@@ -25,6 +27,8 @@ export const TopNav: React.FC<TopNavProps> = ({
   onToggleAddWaypoint,
   theme,
   onToggleTheme,
+  isDebugMode,
+  setIsDebugMode,
 }) => {
   const [isMoving, setIsMoving] = React.useState(true);
 
@@ -126,6 +130,13 @@ export const TopNav: React.FC<TopNavProps> = ({
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
+            <DropdownMenuItem 
+              className="py-3 px-4 text-sm cursor-pointer"
+              onClick={() => setIsDebugMode(!isDebugMode)}
+            >
+              <Bug className="h-4 w-4 mr-2" />
+              {isDebugMode ? 'Disable Debug Mode' : 'Enable Debug Mode'}
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="py-3 px-4 text-sm cursor-pointer text-red-500">
               Sign Out
