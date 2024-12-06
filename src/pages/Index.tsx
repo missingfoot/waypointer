@@ -70,7 +70,10 @@ const Index = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <TopNav />
+      <TopNav 
+        isAddingWaypoint={isAddingWaypoint}
+        onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
+      />
       <div className="flex-1 flex overflow-hidden">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
