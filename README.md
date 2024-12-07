@@ -1,7 +1,3 @@
-## This project is built with:
+# Waypointer
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+An interactive map building tool that helps you create and customize maps for various purposes.
