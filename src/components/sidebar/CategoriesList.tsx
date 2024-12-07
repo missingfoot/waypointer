@@ -65,8 +65,8 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
   }
 
   return (
-    <>
-      <div className="space-y-2 mb-2">
+    <div className="absolute inset-0 flex flex-col">
+      <div className="flex-none space-y-2 mb-2">
         <Input
           placeholder="Filter categories..."
           value={filterText}
@@ -74,7 +74,7 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
           className="h-8"
         />
       </div>
-      <div className="flex justify-between items-center mb-2 -mx-3">
+      <div className="flex-none flex justify-between items-center mb-2 -mx-3">
         <CategoriesSortControls
           sortBy={sortBy}
           sortDirection={sortDirection}
@@ -91,17 +91,19 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
           Add
         </Button>
       </div>
-      <div className="space-y-2">
-        {sortedCategories.map((category) => (
-          <CategoryItem
-            key={category.id}
-            id={category.id}
-            name={category.name}
-            color={category.color}
-            onDelete={onCategoryDelete}
-          />
-        ))}
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="space-y-2">
+          {sortedCategories.map((category) => (
+            <CategoryItem
+              key={category.id}
+              id={category.id}
+              name={category.name}
+              color={category.color}
+              onDelete={onCategoryDelete}
+            />
+          ))}
+        </div>
       </div>
-    </>
+    </div>
   );
 };

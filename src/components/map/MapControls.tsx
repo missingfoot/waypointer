@@ -1,17 +1,19 @@
 import React from 'react';
-import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, Fullscreen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface MapControlsProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onZoomReset: () => void;
+  onFitToView: () => void;
 }
 
 export const MapControls: React.FC<MapControlsProps> = ({
   onZoomIn,
   onZoomOut,
   onZoomReset,
+  onFitToView,
 }) => {
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -20,7 +22,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
 
   return (
     <div 
-      className="absolute bottom-4 right-4 flex flex-col gap-0.5 bg-background rounded-lg shadow-lg border border-border overflow-hidden"
+      className="absolute bottom-4 right-4 flex flex-col bg-background rounded-lg shadow-lg border border-border overflow-hidden"
       onMouseDown={stopPropagation}
       onClick={stopPropagation}
       onDoubleClick={stopPropagation}
@@ -34,20 +36,9 @@ export const MapControls: React.FC<MapControlsProps> = ({
           stopPropagation(e);
           onZoomIn();
         }}
-        className="h-8 w-8 rounded-none hover:bg-accent"
+        className="h-10 w-10 rounded-none hover:bg-accent"
       >
-        <ZoomIn className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={(e) => {
-          stopPropagation(e);
-          onZoomReset();
-        }}
-        className="h-8 w-8 rounded-none hover:bg-accent border-y border-border"
-      >
-        <Maximize2 className="h-4 w-4" />
+        <ZoomIn className="h-4 w-4 scale-125" />
       </Button>
       <Button
         variant="ghost"
@@ -56,9 +47,32 @@ export const MapControls: React.FC<MapControlsProps> = ({
           stopPropagation(e);
           onZoomOut();
         }}
-        className="h-8 w-8 rounded-none hover:bg-accent"
+        className="h-10 w-10 rounded-none hover:bg-accent"
       >
-        <ZoomOut className="h-4 w-4" />
+        <ZoomOut className="h-4 w-4 scale-125" />
+      </Button>
+      <div className="h-[1px] bg-border" />
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={(e) => {
+          stopPropagation(e);
+          onZoomReset();
+        }}
+        className="h-10 w-10 rounded-none hover:bg-accent"
+      >
+        <Maximize className="h-4 w-4 scale-125" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={(e) => {
+          stopPropagation(e);
+          onFitToView();
+        }}
+        className="h-10 w-10 rounded-none hover:bg-accent"
+      >
+        <Fullscreen className="h-4 w-4 scale-125" />
       </Button>
     </div>
   );

@@ -8,6 +8,7 @@ import { useTheme } from 'next-themes';
 
 const Index = () => {
   const [mapUrl, setMapUrl] = React.useState<string | null>(null);
+  const [projectName, setProjectName] = React.useState("My Project");
   const [waypoints, setWaypoints] = React.useState<Array<{
     id: string;
     x: number;
@@ -32,6 +33,29 @@ const Index = () => {
     });
   };
 
+  const handleMapDelete = () => {
+    setMapUrl(null);
+    toast.success('Map deleted successfully', {
+      position: 'top-right'
+    });
+  };
+
+  const handleClearWaypoints = () => {
+    setWaypoints([]);
+    toast.success('All waypoints cleared', {
+      position: 'top-right'
+    });
+  };
+
+  const handleClearCategories = () => {
+    setCategories([]);
+    // Also clear category assignments from waypoints
+    setWaypoints(waypoints.map(wp => ({ ...wp, category: '' })));
+    toast.success('All categories cleared', {
+      position: 'top-right'
+    });
+  };
+
   const handleWaypointAdd = (point: { x: number; y: number; name: string; category: string }) => {
     const newWaypoint = {
       id: Math.random().toString(36).substr(2, 9),
@@ -42,7 +66,13 @@ const Index = () => {
     
     if (!categories.some(cat => cat.name === point.category)) {
       const categoryColors = ['#9b87f5', '#F97316', '#0EA5E9', '#D946EF', '#33C3F0', '#FEC6A1', '#E5DEFF', '#D3E4FD', '#8B5CF6', '#1EAEDB'];
-      handleCategoryAdd(point.category, categoryColors[categories.length % categoryColors.length]);
+      const color = categoryColors[categories.length % categoryColors.length];
+      const newCategory = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: point.category,
+        color: color,
+      };
+      setCategories(prevCategories => [...prevCategories, newCategory]);
     }
     
     toast.success('Waypoint added successfully', {
@@ -86,15 +116,28 @@ const Index = () => {
     });
   };
 
+  const handleImportWorkspace = (imageUrl: string, importedWaypoints: Array<any>, importedCategories: Array<any>) => {
+    console.log('Handling import in Index:', { imageUrl, importedWaypoints, importedCategories });
+    setMapUrl(imageUrl);
+    setWaypoints(importedWaypoints);
+    setCategories(importedCategories);
+  };
+
   return (
     <div className="h-screen flex flex-col">
-      <TopNav 
+      <TopNav
         isAddingWaypoint={isAddingWaypoint}
         onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
         theme={theme as 'light' | 'dark' | 'system'}
-        onToggleTheme={(newTheme) => setTheme(newTheme)}
+        onToggleTheme={setTheme}
         isDebugMode={isDebugMode}
         setIsDebugMode={setIsDebugMode}
+        projectName={projectName}
+        onProjectNameChange={setProjectName}
+        mapUrl={mapUrl}
+        waypoints={waypoints}
+        categories={categories}
+        onImport={handleImportWorkspace}
       />
       <div className="flex-1 flex overflow-hidden">
         <ResizablePanelGroup direction="horizontal">
@@ -107,8 +150,11 @@ const Index = () => {
               onCategoryDelete={handleCategoryDelete}
               onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
               isAddingWaypoint={isAddingWaypoint}
-              isDebugMode={isDebugMode}
-              setIsDebugMode={setIsDebugMode}
+              mapUrl={mapUrl}
+              onMapUpload={handleMapUpload}
+              onMapDelete={handleMapDelete}
+              onClearWaypoints={handleClearWaypoints}
+              onClearCategories={handleClearCategories}
             />
           </ResizablePanel>
           <ResizableHandle />

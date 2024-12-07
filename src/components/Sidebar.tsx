@@ -14,6 +14,11 @@ interface SidebarProps {
   onCategoryDelete: (id: string) => void;
   onToggleAddWaypoint: () => void;
   isAddingWaypoint: boolean;
+  mapUrl: string | null;
+  onMapUpload: (file: File) => void;
+  onMapDelete: () => void;
+  onClearWaypoints: () => void;
+  onClearCategories: () => void;
 }
 
 interface Waypoint {
@@ -36,10 +41,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCategoryDelete,
   onToggleAddWaypoint,
   isAddingWaypoint,
+  mapUrl,
+  onMapUpload,
+  onMapDelete,
+  onClearWaypoints,
+  onClearCategories,
 }) => {
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
   const addButtonRef = useRef<HTMLButtonElement>(null);
+  const [mapDimensions, setMapDimensions] = useState<{ width: number; height: number } | null>(null);
+
+  React.useEffect(() => {
+    if (mapUrl) {
+      const img = new Image();
+      img.onload = () => {
+        setMapDimensions({ width: img.width, height: img.height });
+      };
+      img.src = mapUrl;
+    } else {
+      setMapDimensions(null);
+    }
+  }, [mapUrl]);
 
   const handleAddCategoryClick = () => {
     const buttonRect = addButtonRef.current?.getBoundingClientRect();
@@ -53,12 +76,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="w-full bg-card">
+    <div className="w-full bg-card h-full flex flex-col">
       <Tabs defaultValue="waypoints" className="h-full flex flex-col">
-        <TabsHeader />
+        <TabsHeader className="flex-none" />
 
-        <div className="flex-1 px-4 py-4">
-          <TabsContent value="waypoints" className="mt-0 h-full">
+        <div className="flex-1 px-4 pt-4 min-h-0">
+          <TabsContent value="waypoints" className="mt-0 h-full relative">
             <WaypointsList
               waypoints={waypoints}
               categories={categories}
@@ -66,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           </TabsContent>
 
-          <TabsContent value="categories" className="mt-0 h-full">
+          <TabsContent value="categories" className="mt-0 h-full relative">
             <CategoriesList
               categories={categories}
               onCategoryDelete={onCategoryDelete}
@@ -75,8 +98,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           </TabsContent>
 
-          <TabsContent value="settings" className="mt-0 h-full">
-            <SettingsTab />
+          <TabsContent value="settings" className="mt-0 h-full relative">
+            <SettingsTab
+              mapImage={mapDimensions}
+              hasWaypoints={waypoints.length > 0}
+              onReplaceImage={onMapUpload}
+              onDeleteImage={onMapDelete}
+              onClearWaypoints={onClearWaypoints}
+              onClearCategories={onClearCategories}
+            />
           </TabsContent>
         </div>
       </Tabs>

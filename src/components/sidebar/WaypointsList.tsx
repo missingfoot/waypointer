@@ -36,7 +36,10 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
   const [filterText, setFilterText] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  const [groupByCategory, setGroupByCategory] = useState(false);
+  const [groupByCategory, setGroupByCategory] = useState<boolean>(() => {
+    const saved = localStorage.getItem('waypoints-group-by-category');
+    return saved ? JSON.parse(saved) : false;
+  });
 
   const getCategoryColor = (categoryName: string) => {
     const category = categories.find(cat => cat.name === categoryName);
@@ -50,6 +53,14 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
       setSortBy(newSortBy);
       setSortDirection('asc');
     }
+  };
+
+  const toggleGrouping = () => {
+    setGroupByCategory(prev => {
+      const newValue = !prev;
+      localStorage.setItem('waypoints-group-by-category', JSON.stringify(newValue));
+      return newValue;
+    });
   };
 
   const filteredWaypoints = waypoints.filter(waypoint =>
@@ -95,8 +106,8 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
   }
 
   return (
-    <div className="space-y-2">
-      <div className="space-y-2 mb-2">
+    <div className="absolute inset-0 flex flex-col">
+      <div className="flex-none space-y-2 mb-2">
         <Input
           placeholder="Filter waypoints..."
           value={filterText}
@@ -104,7 +115,7 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
           className="h-8"
         />
       </div>
-      <div className="flex justify-between items-center mb-2 -mx-3">
+      <div className="flex-none flex justify-between items-center mb-2 -mx-3">
         <WaypointsSortControls
           sortBy={sortBy}
           sortDirection={sortDirection}
@@ -113,51 +124,54 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
         <Button
           size="sm"
           variant="ghost"
-          onClick={() => setGroupByCategory(!groupByCategory)}
-          className={`h-8 px-3 ${groupByCategory ? 'bg-primary/10 text-primary hover:bg-primary/20' : ''}`}
+          onClick={toggleGrouping}
+          className="h-8 px-3"
         >
-          <Group className="h-4 w-4 mr-1" />
-          Group
+          {groupByCategory ? 'Ungroup' : 'Group'}
         </Button>
       </div>
-      <div className={`space-y-${groupByCategory ? '4' : '2'}`}>
-        {groupByCategory && groupedWaypoints ? (
-          groupedWaypoints.map(({ category, color, waypoints }) => (
-            <div key={category} className="space-y-2">
-              <div 
-                className="text-sm font-medium px-2 py-1 rounded-md"
-                style={{ backgroundColor: `${color}20` }}
-              >
-                {category}
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className={`space-y-${groupByCategory ? '4' : '2'} pb-6`}>
+          {groupByCategory && groupedWaypoints ? (
+            groupedWaypoints.map(({ category, color, waypoints }) => (
+              <div key={category} className="space-y-2">
+                <div 
+                  className="text-sm font-medium px-2 py-1 rounded-md"
+                  style={{ backgroundColor: `${color}20` }}
+                >
+                  {category}
+                </div>
+                {waypoints.map((waypoint) => (
+                  <WaypointItem
+                    key={waypoint.id}
+                    id={waypoint.id}
+                    name={waypoint.name}
+                    category={waypoint.category}
+                    categoryColor={getCategoryColor(waypoint.category)}
+                    x={waypoint.x}
+                    y={waypoint.y}
+                    onDelete={onWaypointDelete}
+                    hideCategory={true}
+                  />
+                ))}
               </div>
-              {waypoints.map((waypoint) => (
-                <WaypointItem
-                  key={waypoint.id}
-                  id={waypoint.id}
-                  name={waypoint.name}
-                  category={waypoint.category}
-                  categoryColor={getCategoryColor(waypoint.category)}
-                  x={waypoint.x}
-                  y={waypoint.y}
-                  onDelete={onWaypointDelete}
-                />
-              ))}
-            </div>
-          ))
-        ) : (
-          sortedWaypoints.map((waypoint) => (
-            <WaypointItem
-              key={waypoint.id}
-              id={waypoint.id}
-              name={waypoint.name}
-              category={waypoint.category}
-              categoryColor={getCategoryColor(waypoint.category)}
-              x={waypoint.x}
-              y={waypoint.y}
-              onDelete={onWaypointDelete}
-            />
-          ))
-        )}
+            ))
+          ) : (
+            sortedWaypoints.map((waypoint) => (
+              <WaypointItem
+                key={waypoint.id}
+                id={waypoint.id}
+                name={waypoint.name}
+                category={waypoint.category}
+                categoryColor={getCategoryColor(waypoint.category)}
+                x={waypoint.x}
+                y={waypoint.y}
+                onDelete={onWaypointDelete}
+                hideCategory={false}
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

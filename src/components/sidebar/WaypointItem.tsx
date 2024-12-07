@@ -9,6 +9,7 @@ interface WaypointItemProps {
   x: number;
   y: number;
   onDelete: (id: string) => void;
+  hideCategory?: boolean;
 }
 
 export const WaypointItem: React.FC<WaypointItemProps> = ({
@@ -17,6 +18,7 @@ export const WaypointItem: React.FC<WaypointItemProps> = ({
   category,
   categoryColor,
   onDelete,
+  hideCategory = false,
 }) => {
   return (
     <div className="flex items-center justify-between p-2 rounded-md bg-muted relative">
@@ -26,7 +28,9 @@ export const WaypointItem: React.FC<WaypointItemProps> = ({
       />
       <div className="flex flex-col gap-1 pl-4">
         <p className="font-medium">{name}</p>
-        <p className="text-sm text-muted-foreground">{category}</p>
+        {!hideCategory && (
+          <p className="text-sm text-muted-foreground">{category}</p>
+        )}
       </div>
       <Button
         variant="ghost"
