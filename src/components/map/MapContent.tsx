@@ -10,6 +10,7 @@ interface MapContentProps {
     y: number;  // normalized (0-1)
     name: string;
     category: string;
+    categoryColor?: string;
   }>;
   onWaypointClick?: (id: string) => void;
   imageRef?: React.RefObject<HTMLImageElement>;
@@ -20,6 +21,7 @@ interface MapContentProps {
     resetZoom: () => void;
     fitToView: () => void;
   }) => void;
+  onTransformChange?: (scale: number, x: number, y: number) => void;
 }
 
 export const MapContent: React.FC<MapContentProps> = ({
@@ -29,12 +31,14 @@ export const MapContent: React.FC<MapContentProps> = ({
   imageRef: externalImageRef,
   onImageLoad,
   onZoomCallbacksChange,
+  onTransformChange,
 }) => {
   const internalImageRef = useRef<HTMLImageElement>(null);
   const imageRef = externalImageRef || internalImageRef;
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const hasCalledOnLoadRef = useRef(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [currentScale, setCurrentScale] = useState(1);
 
   useEffect(() => {
     const handleLoad = () => {
@@ -72,6 +76,10 @@ export const MapContent: React.FC<MapContentProps> = ({
       wheel={{ step: 0.25 }}
       alignmentAnimation={{ sizeX: 100, sizeY: 100 }}
       limitToBounds={true}
+      onTransformed={(_, state) => {
+        setCurrentScale(state.scale);
+        onTransformChange?.(state.scale, state.positionX, state.positionY);
+      }}
     >
       {({ zoomIn, zoomOut, resetTransform, centerView, setTransform }) => {
         const handleFitToView = () => {
@@ -83,10 +91,8 @@ export const MapContent: React.FC<MapContentProps> = ({
 
           let scale;
           if (imageAspectRatio > wrapperAspectRatio) {
-            // Image is wider than wrapper relative to height
             scale = (wrapper.width / dimensions.width) * 0.95;
           } else {
-            // Image is taller than wrapper relative to width
             scale = (wrapper.height / dimensions.height) * 0.95;
           }
 
@@ -139,15 +145,20 @@ export const MapContent: React.FC<MapContentProps> = ({
                     }}
                     draggable={false}
                   />
-                  {dimensions && waypoints.map((waypoint) => (
+                  {dimensions && waypoints?.map((waypoint) => (
                     <div
                       key={waypoint.id}
-                      className="absolute w-4 h-4 -ml-2 -mt-2 bg-blue-500 rounded-full border-2 border-white shadow-md cursor-pointer animate-fade-in hover:bg-blue-600 transition-colors"
+                      data-waypoint-id={waypoint.id}
+                      className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white shadow-md cursor-pointer animate-fade-in transition-colors"
                       style={{
                         left: `${waypoint.x * dimensions.width}px`,
                         top: `${waypoint.y * dimensions.height}px`,
+                        backgroundColor: waypoint.categoryColor || '#9b87f5',
                       }}
-                      onClick={() => onWaypointClick?.(waypoint.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onWaypointClick?.(waypoint.id);
+                      }}
                       title={waypoint.name}
                     />
                   ))}
@@ -159,6 +170,7 @@ export const MapContent: React.FC<MapContentProps> = ({
               onZoomOut={() => zoomOut(0.25)}
               onZoomReset={handleResetView}
               onFitToView={handleFitToView}
+              currentScale={currentScale}
             />
           </>
         );

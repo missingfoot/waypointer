@@ -11,6 +11,11 @@ interface WaypointDialogProps {
   categories: Array<{ id: string; name: string; color: string }>;
   onCategoryAdd: (name: string, color: string) => void;
   position: { x: number; y: number };
+  editMode?: boolean;
+  initialData?: {
+    name: string;
+    category: string;
+  };
 }
 
 export const WaypointDialog: React.FC<WaypointDialogProps> = ({
@@ -20,6 +25,8 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
   categories = [],
   onCategoryAdd,
   position,
+  editMode = false,
+  initialData,
 }) => {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
@@ -28,6 +35,10 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
 
   useEffect(() => {
     if (open) {
+      if (editMode && initialData) {
+        setName(initialData.name);
+        setCategory(initialData.category);
+      }
       setTimeout(() => {
         descriptionInputRef.current?.focus();
       }, 0);
@@ -36,7 +47,7 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
       setCategory('');
       setShowSuggestions(false);
     }
-  }, [open]);
+  }, [open, editMode, initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,7 +139,7 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
             type="submit"
             className="h-7 text-xs px-2"
           >
-            Add
+            {editMode ? 'Save' : 'Add'}
           </Button>
         </div>
       </form>

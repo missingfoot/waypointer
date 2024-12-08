@@ -2,175 +2,144 @@ import React from 'react';
 import { MapWorkspace } from '@/components/MapWorkspace';
 import { Sidebar } from '@/components/Sidebar';
 import { TopNav } from '@/components/TopNav';
-import { toast } from 'sonner';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { useTheme } from 'next-themes';
+import { useMapState } from '@/hooks/useMapState';
 
 const Index = () => {
-  const [mapUrl, setMapUrl] = React.useState<string | null>(null);
-  const [projectName, setProjectName] = React.useState("My Project");
-  const [waypoints, setWaypoints] = React.useState<Array<{
-    id: string;
-    x: number;
-    y: number;
-    name: string;
-    category: string;
-  }>>([]);
-  const [categories, setCategories] = React.useState<Array<{
-    id: string;
-    name: string;
-    color: string;
-  }>>([]);
-  const [isAddingWaypoint, setIsAddingWaypoint] = React.useState(false);
-  const [isDebugMode, setIsDebugMode] = React.useState(false);
   const { theme, setTheme } = useTheme();
-
-  const handleMapUpload = (file: File) => {
-    const url = URL.createObjectURL(file);
-    setMapUrl(url);
-    toast.success('Map uploaded successfully', {
-      position: 'top-right'
-    });
-  };
-
-  const handleMapDelete = () => {
-    setMapUrl(null);
-    toast.success('Map deleted successfully', {
-      position: 'top-right'
-    });
-  };
-
-  const handleClearWaypoints = () => {
-    setWaypoints([]);
-    toast.success('All waypoints cleared', {
-      position: 'top-right'
-    });
-  };
-
-  const handleClearCategories = () => {
-    setCategories([]);
-    // Also clear category assignments from waypoints
-    setWaypoints(waypoints.map(wp => ({ ...wp, category: '' })));
-    toast.success('All categories cleared', {
-      position: 'top-right'
-    });
-  };
-
-  const handleWaypointAdd = (point: { x: number; y: number; name: string; category: string }) => {
-    const newWaypoint = {
-      id: Math.random().toString(36).substr(2, 9),
-      ...point,
-    };
-
-    setWaypoints([...waypoints, newWaypoint]);
-    
-    if (!categories.some(cat => cat.name === point.category)) {
-      const categoryColors = ['#9b87f5', '#F97316', '#0EA5E9', '#D946EF', '#33C3F0', '#FEC6A1', '#E5DEFF', '#D3E4FD', '#8B5CF6', '#1EAEDB'];
-      const color = categoryColors[categories.length % categoryColors.length];
-      const newCategory = {
-        id: Math.random().toString(36).substr(2, 9),
-        name: point.category,
-        color: color,
-      };
-      setCategories(prevCategories => [...prevCategories, newCategory]);
-    }
-    
-    toast.success('Waypoint added successfully', {
-      position: 'top-right'
-    });
-  };
-
-  const handleWaypointDelete = (id: string) => {
-    setWaypoints(waypoints.filter((wp) => wp.id !== id));
-    toast.success('Waypoint deleted successfully', {
-      position: 'top-right'
-    });
-  };
-
-  const handleCategoryAdd = (name: string, color: string) => {
-    const trimmedName = name.trim();
-    if (!trimmedName) return;
-    
-    if (categories.some(cat => cat.name.toLowerCase() === trimmedName.toLowerCase())) {
-      toast.error('Category already exists', {
-        position: 'top-right'
-      });
-      return;
-    }
-    
-    const newCategory = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: trimmedName,
-      color: color,
-    };
-    setCategories(prevCategories => [...prevCategories, newCategory]);
-    toast.success('Category added successfully', {
-      position: 'top-right'
-    });
-  };
-
-  const handleCategoryDelete = (id: string) => {
-    setCategories(categories.filter((cat) => cat.id !== id));
-    toast.success('Category deleted successfully', {
-      position: 'top-right'
-    });
-  };
-
-  const handleImportWorkspace = (imageUrl: string, importedWaypoints: Array<any>, importedCategories: Array<any>) => {
-    console.log('Handling import in Index:', { imageUrl, importedWaypoints, importedCategories });
-    setMapUrl(imageUrl);
-    setWaypoints(importedWaypoints);
-    setCategories(importedCategories);
-  };
+  const {
+    mapUrl,
+    projectName,
+    waypoints,
+    categories,
+    isAddingWaypoint,
+    isDebugMode,
+    setProjectName,
+    setIsAddingWaypoint,
+    setIsDebugMode,
+    handlers
+  } = useMapState();
 
   return (
     <div className="h-screen flex flex-col">
-      <TopNav
-        isAddingWaypoint={isAddingWaypoint}
-        onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
-        theme={theme as 'light' | 'dark' | 'system'}
-        onToggleTheme={setTheme}
-        isDebugMode={isDebugMode}
-        setIsDebugMode={setIsDebugMode}
-        projectName={projectName}
-        onProjectNameChange={setProjectName}
-        mapUrl={mapUrl}
-        waypoints={waypoints}
-        categories={categories}
-        onImport={handleImportWorkspace}
-      />
-      <div className="flex-1 flex overflow-hidden">
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
-            <Sidebar
-              waypoints={waypoints}
-              categories={categories}
-              onWaypointDelete={handleWaypointDelete}
-              onCategoryAdd={handleCategoryAdd}
-              onCategoryDelete={handleCategoryDelete}
-              onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
-              isAddingWaypoint={isAddingWaypoint}
-              mapUrl={mapUrl}
-              onMapUpload={handleMapUpload}
-              onMapDelete={handleMapDelete}
-              onClearWaypoints={handleClearWaypoints}
-              onClearCategories={handleClearCategories}
-            />
-          </ResizablePanel>
-          <ResizableHandle />
-          <ResizablePanel defaultSize={80}>
-            <MapWorkspace
-              onMapUpload={handleMapUpload}
-              mapUrl={mapUrl}
-              waypoints={waypoints}
-              onWaypointAdd={handleWaypointAdd}
-              isAddingWaypoint={isAddingWaypoint}
-              categories={categories}
-              onCategoryAdd={handleCategoryAdd}
-              isDebugMode={isDebugMode}
-            />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+      <div className="order-none sm:order-last flex-1 flex overflow-hidden">
+        <div className="flex-col w-full sm:hidden">
+          <ResizablePanelGroup 
+            direction="vertical"
+            className="w-full [&>div]:flex-1"
+            autoSaveId="workspace-layout-mobile"
+          >
+            <ResizablePanel 
+              defaultSize={75} 
+              minSize={30}
+              maxSize={85}
+            >
+              <MapWorkspace
+                onMapUpload={handlers.handleMapUpload}
+                mapUrl={mapUrl}
+                waypoints={waypoints}
+                onWaypointAdd={handlers.handleWaypointAdd}
+                onWaypointEdit={handlers.handleWaypointEdit}
+                isAddingWaypoint={isAddingWaypoint}
+                categories={categories}
+                onCategoryAdd={handlers.handleCategoryAdd}
+                isDebugMode={isDebugMode}
+                setIsDebugMode={setIsDebugMode}
+              />
+            </ResizablePanel>
+            <ResizableHandle className="relative h-0 -mb-2 z-30 bg-transparent hover:bg-transparent focus-visible:outline-none focus-visible:ring-0 after:hidden data-[panel-group-direction=vertical]:after:hidden">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-1 bg-border/40 hover:bg-border/60 rounded-full transition-colors cursor-row-resize" />
+            </ResizableHandle>
+            <ResizablePanel 
+              defaultSize={25} 
+              minSize={15} 
+              maxSize={70}
+              className="relative min-h-[240px] bg-card rounded-t-xl shadow-[0_-8px_16px_rgba(0,0,0,0.1)] z-20 -mt-2"
+            >
+              <div className="h-4" />
+              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-8 h-1 bg-[#dddddd] dark:bg-[#444444] rounded-full" />
+              <Sidebar
+                waypoints={waypoints}
+                categories={categories}
+                onWaypointDelete={handlers.handleWaypointDelete}
+                onCategoryAdd={handlers.handleCategoryAdd}
+                onCategoryDelete={handlers.handleCategoryDelete}
+                onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
+                isAddingWaypoint={isAddingWaypoint}
+                mapUrl={mapUrl}
+                onMapUpload={handlers.handleMapUpload}
+                onMapDelete={handlers.handleMapDelete}
+                onClearWaypoints={handlers.handleClearWaypoints}
+                onClearCategories={handlers.handleClearCategories}
+              />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
+        <div className="hidden sm:flex w-full">
+          <ResizablePanelGroup 
+            direction="horizontal"
+            className="w-full"
+            autoSaveId="workspace-layout-desktop"
+          >
+            <ResizablePanel 
+              defaultSize={20}
+              minSize={20}
+              maxSize={35}
+              style={{ 
+                minWidth: '280px',
+                maxWidth: '400px',
+                width: '280px'
+              }}
+            >
+              <Sidebar
+                waypoints={waypoints}
+                categories={categories}
+                onWaypointDelete={handlers.handleWaypointDelete}
+                onCategoryAdd={handlers.handleCategoryAdd}
+                onCategoryDelete={handlers.handleCategoryDelete}
+                onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
+                isAddingWaypoint={isAddingWaypoint}
+                mapUrl={mapUrl}
+                onMapUpload={handlers.handleMapUpload}
+                onMapDelete={handlers.handleMapDelete}
+                onClearWaypoints={handlers.handleClearWaypoints}
+                onClearCategories={handlers.handleClearCategories}
+              />
+            </ResizablePanel>
+            <ResizableHandle />
+            <ResizablePanel defaultSize={80}>
+              <MapWorkspace
+                onMapUpload={handlers.handleMapUpload}
+                mapUrl={mapUrl}
+                waypoints={waypoints}
+                onWaypointAdd={handlers.handleWaypointAdd}
+                onWaypointEdit={handlers.handleWaypointEdit}
+                isAddingWaypoint={isAddingWaypoint}
+                categories={categories}
+                onCategoryAdd={handlers.handleCategoryAdd}
+                isDebugMode={isDebugMode}
+                setIsDebugMode={setIsDebugMode}
+              />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
+      </div>
+      <div className="order-last sm:order-none">
+        <TopNav
+          isAddingWaypoint={isAddingWaypoint}
+          onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
+          theme={theme as 'light' | 'dark' | 'system'}
+          onToggleTheme={setTheme}
+          isDebugMode={isDebugMode}
+          setIsDebugMode={setIsDebugMode}
+          projectName={projectName}
+          onProjectNameChange={setProjectName}
+          mapUrl={mapUrl}
+          waypoints={waypoints}
+          categories={categories}
+          onImport={handlers.handleImportWorkspace}
+        />
       </div>
     </div>
   );

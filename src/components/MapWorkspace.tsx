@@ -1,25 +1,25 @@
-import React, { useRef, useState } from 'react';
-import { toast } from 'sonner';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { MapUploadInterface } from './map/MapUploadInterface';
 import { MapInteractionHandler } from './map/MapInteractionHandler';
 import { DebugOverlay } from './map/DebugOverlay';
 import { WaypointDialog } from './dialogs/WaypointDialog';
+import { useDebugMode } from '@/hooks/useDebugMode';
+import { useWaypointDialog } from '@/hooks/useWaypointDialog';
+import { showErrorToast } from '@/utils/toast';
+import { normalizedToScreen, normalizedToPercent } from '@/utils/coordinates';
+import { Waypoint, Category, Dimensions, Point } from '@/types';
 
 interface MapWorkspaceProps {
   onMapUpload: (file: File) => void;
   mapUrl: string | null;
-  waypoints: Array<{
-    id: string;
-    x: number;  // percentage (0-100)
-    y: number;  // percentage (0-100)
-    name: string;
-    category: string;
-  }>;
+  waypoints: Waypoint[];
   onWaypointAdd: (point: { x: number; y: number; name: string; category: string }) => void;
+  onWaypointEdit: (id: string, updates: { name: string; category: string }) => void;
   isAddingWaypoint: boolean;
-  categories: Array<{ id: string; name: string; color: string }>;
+  categories: Category[];
   onCategoryAdd: (name: string, color: string) => void;
   isDebugMode: boolean;
+  setIsDebugMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
@@ -27,28 +27,78 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   mapUrl,
   waypoints,
   onWaypointAdd,
+  onWaypointEdit,
   isAddingWaypoint,
   categories,
   onCategoryAdd,
   isDebugMode,
+  setIsDebugMode,
 }) => {
   const imageRef = useRef<HTMLImageElement>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null);
-  const [dialogPosition, setDialogPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
-  const [clickHistory, setClickHistory] = useState<Array<{
-    id: number;
-    pixels: { x: number; y: number };
-    percent: { x: number; y: number };
-    scale: number;
-  }>>([]);
-  const [waypointHistory, setWaypointHistory] = useState<Array<{
-    id: number;
-    pixels: { x: number; y: number };
-    percent: { x: number; y: number };
-    scale: number;
-  }>>([]);
+  const [imageDimensions, setImageDimensions] = useState<Dimensions | null>(null);
+  const [transformState, setTransformState] = useState({ scale: 1, positionX: 0, positionY: 0 });
+
+  const {
+    clickHistory,
+    waypointHistory,
+    cursorPosition,
+    cursorPercent,
+    scale,
+    position,
+    handleDebugReset,
+    addClickToHistory,
+    addWaypointToHistory,
+    updateCursorPosition
+  } = useDebugMode();
+
+  const {
+    dialogOpen,
+    setDialogOpen,
+    dialogPosition,
+    editingWaypoint,
+    pendingPoint,
+    handleWaypointClick,
+    handleCoordinateSelect,
+    handleWaypointSubmit
+  } = useWaypointDialog({
+    onWaypointAdd: (point) => {
+      onWaypointAdd(point);
+      if (isDebugMode && imageDimensions && pendingPoint) {
+        const screenPos = normalizedToScreen(pendingPoint, imageDimensions);
+        addWaypointToHistory(
+          screenPos,
+          { x: point.x, y: point.y },
+          transformState.scale
+        );
+      }
+    },
+    onWaypointEdit,
+    waypoints
+  });
+
+  const handleImageLoad = (dimensions: Dimensions) => {
+    setImageDimensions(dimensions);
+  };
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (isDebugMode && imageRef.current) {
+      const rect = imageRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const percentX = (x / rect.width) * 100;
+      const percentY = (y / rect.height) * 100;
+      updateCursorPosition(
+        { x, y },
+        { x: percentX, y: percentY },
+        transformState.scale,
+        { x: transformState.positionX, y: transformState.positionY }
+      );
+    }
+  }, [isDebugMode, transformState, updateCursorPosition]);
+
+  const handleTransformChange = useCallback((scale: number, x: number, y: number) => {
+    setTransformState({ scale, positionX: x, positionY: y });
+  }, []);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -56,74 +106,28 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     if (file && file.type.startsWith('image/')) {
       onMapUpload(file);
     } else {
-      toast.error('Please upload an image file', {
-        position: 'top-right'
-      });
+      showErrorToast('Please upload an image file');
     }
   };
 
-  const handleImageLoad = (dimensions: { width: number; height: number }) => {
-    setImageDimensions(dimensions);
-  };
-
-  const handleDebugReset = () => {
-    setClickHistory([]);
-    setWaypointHistory([]);
-  };
-
-  const handleCoordinateSelect = (normalized: { x: number; y: number }, screenPosition: { x: number; y: number }) => {
-    if (isDebugMode) {
-      setClickHistory(prev => [...prev, {
-        id: prev.length + 1,
-        pixels: screenPosition,
-        percent: {
-          x: normalized.x * 100,
-          y: normalized.y * 100
-        },
-        scale: 1
-      }]);
-    }
-
-    setPendingPoint(normalized);
-    setDialogPosition(screenPosition);
-    setDialogOpen(true);
-  };
-
-  const handleWaypointSubmit = (name: string, category: string) => {
-    if (!pendingPoint) return;
-
-    const screenPosition = {
-      x: pendingPoint.x * (imageDimensions?.width || 0),
-      y: pendingPoint.y * (imageDimensions?.height || 0)
+  // Add keyboard shortcut for debug mode
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'b' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        setIsDebugMode?.(!isDebugMode);
+      }
     };
 
-    if (isDebugMode) {
-      setWaypointHistory(prev => [...prev, {
-        id: prev.length + 1,
-        pixels: screenPosition,
-        percent: {
-          x: pendingPoint.x * 100,
-          y: pendingPoint.y * 100
-        },
-        scale: 1
-      }]);
-    }
-
-    onWaypointAdd({
-      x: pendingPoint.x * 100,
-      y: pendingPoint.y * 100,
-      name,
-      category
-    });
-    setPendingPoint(null);
-    setDialogOpen(false);
-  };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isDebugMode, setIsDebugMode]);
 
   return (
     <div 
-      className="flex-1 bg-workspace h-full"
+      className="relative w-full h-full"
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
+      onMouseMove={handleMouseMove}
     >
       {!mapUrl ? (
         <MapUploadInterface onMapUpload={onMapUpload} />
@@ -131,26 +135,35 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
         <>
           <MapInteractionHandler
             mapUrl={mapUrl}
-            waypoints={waypoints.map(wp => ({
-              ...wp,
-              x: wp.x / 100,
-              y: wp.y / 100
-            }))}
+            waypoints={waypoints}
             isAddingWaypoint={isAddingWaypoint}
-            onCoordinateSelect={handleCoordinateSelect}
+            onCoordinateSelect={(normalized, screenPosition) => {
+              if (isDebugMode) {
+                addClickToHistory(
+                  screenPosition,
+                  { x: normalized.x * 100, y: normalized.y * 100 },
+                  transformState.scale
+                );
+              }
+              handleCoordinateSelect(normalized, screenPosition);
+            }}
+            onWaypointClick={handleWaypointClick}
             imageRef={imageRef}
             onImageLoad={handleImageLoad}
+            categories={categories}
+            onTransformChange={handleTransformChange}
           />
           {isDebugMode && (
             <DebugOverlay
-              cursorPosition={{ x: 0, y: 0 }}
-              cursorPercent={{ x: 0, y: 0 }}
-              position={{ x: 0, y: 0 }}
-              scale={1}
-              imageDimensions={imageDimensions}
               clickHistory={clickHistory}
               waypointHistory={waypointHistory}
+              combinedHistory={[...clickHistory, ...waypointHistory].sort((a, b) => a.timestamp - b.timestamp)}
               onReset={handleDebugReset}
+              cursorPosition={cursorPosition}
+              cursorPercent={cursorPercent}
+              position={position}
+              scale={scale}
+              imageDimensions={imageDimensions}
             />
           )}
           <WaypointDialog
@@ -160,6 +173,8 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
             categories={categories}
             onCategoryAdd={onCategoryAdd}
             position={dialogPosition}
+            editMode={!!editingWaypoint}
+            initialData={editingWaypoint ? waypoints.find(w => w.id === editingWaypoint) : undefined}
           />
         </>
       )}

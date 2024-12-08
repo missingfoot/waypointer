@@ -1,56 +1,36 @@
-import { NormalizedCoordinate, ScreenCoordinate, Transform } from '../types/coordinates';
+import { Point, Dimensions } from '../types';
 
-interface ImageDimensions {
-  width: number;
-  height: number;
-}
-
-// Convert screen coordinates to normalized coordinates (0-1)
-export function screenToNormalized(
-  screen: ScreenCoordinate,
-  transform: Transform,
-  imageDimensions: ImageDimensions
-): NormalizedCoordinate {
-  // Remove pan offset and convert to normalized coordinates (0-1)
-  // Scale is handled by the DOM transform
+export function normalizeCoordinates(point: Point, dimensions: Dimensions): Point {
   return {
-    x: (screen.x - transform.position.x) / (imageDimensions.width * transform.scale),
-    y: (screen.y - transform.position.y) / (imageDimensions.height * transform.scale)
+    x: point.x / dimensions.width,
+    y: point.y / dimensions.height
   };
 }
 
-// Convert normalized coordinates (0-1) to screen coordinates
-export function normalizedToScreen(
-  normalized: NormalizedCoordinate,
-  transform: Transform,
-  imageDimensions: ImageDimensions
-): ScreenCoordinate {
-  // Convert normalized (0-1) to screen coordinates
-  // Scale is handled by the DOM transform
+export function screenToNormalized(point: Point, rect: DOMRect): Point {
   return {
-    x: transform.position.x + (normalized.x * imageDimensions.width * transform.scale),
-    y: transform.position.y + (normalized.y * imageDimensions.height * transform.scale)
+    x: (point.x - rect.left) / rect.width,
+    y: (point.y - rect.top) / rect.height
   };
 }
 
-// Get cursor position in both coordinate spaces
-export function getCursorCoordinates(
-  event: React.MouseEvent,
-  containerRect: DOMRect,
-  transform: Transform,
-  imageDimensions: ImageDimensions
-) {
-  // Get screen coordinates relative to container
-  const screen: ScreenCoordinate = {
-    x: event.clientX - containerRect.left,
-    y: event.clientY - containerRect.top
-  };
-
-  // Convert to normalized coordinates
-  const normalized = screenToNormalized(screen, transform, imageDimensions);
-
+export function normalizedToScreen(normalized: Point, dimensions: Dimensions): Point {
   return {
-    screen,
-    normalized
+    x: normalized.x * dimensions.width,
+    y: normalized.y * dimensions.height
+  };
+}
+
+export function percentToNormalized(percent: Point): Point {
+  return {
+    x: percent.x / 100,
+    y: percent.y / 100
+  };
+}
+
+export function normalizedToPercent(normalized: Point): Point {
+  return {
+    x: normalized.x * 100,
+    y: normalized.y * 100
   };
 } 

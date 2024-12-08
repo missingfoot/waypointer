@@ -181,8 +181,8 @@ export const TopNav: React.FC<TopNavProps> = ({
   };
 
   return (
-    <div className="h-14 border-b border-border px-4 grid grid-cols-3 items-center bg-card">
-      <div className="flex items-center gap-2">
+    <div className="h-14 border-t sm:border-t-0 sm:border-b border-border px-4 grid grid-cols-3 items-center bg-card">
+      <div className="flex items-center gap-2 order-last sm:order-first justify-end sm:justify-start">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="gap-2">
@@ -292,7 +292,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         </DropdownMenu>
         
         {isEditingName ? (
-          <div className="flex items-center h-10 px-3 min-w-[100px] max-w-[600px]">
+          <div className="hidden sm:flex items-center h-10 px-3 min-w-[100px] max-w-[600px]">
             <Input
               ref={inputRef}
               value={tempProjectName}
@@ -308,7 +308,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         ) : (
           <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 h-10 px-3">
+              <Button variant="ghost" className="hidden sm:flex gap-2 h-10 px-3">
                 {truncateText(projectName)}
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -331,14 +331,14 @@ export const TopNav: React.FC<TopNavProps> = ({
         )}
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center col-start-2">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button 
                 variant={isAddingWaypoint ? "default" : "ghost"} 
                 onClick={handleWaypointClick}
-                className={`h-14 w-14 rounded-none p-0 flex items-center justify-center focus:outline-none ${isAddingWaypoint ? 'bg-blue-500 hover:bg-blue-600 [&>svg]:text-white dark:[&>svg]:text-white' : ''}`}
+                className={`aspect-square h-14 w-14 flex-none rounded-none p-0 flex items-center justify-center focus:outline-none ${isAddingWaypoint ? 'bg-blue-500 hover:bg-blue-600 [&>svg]:text-white dark:[&>svg]:text-white' : ''}`}
               >
                 <MapPinIcon className="!h-[24px] !w-[24px] min-h-[24px] min-w-[24px]" />
               </Button>
@@ -352,7 +352,7 @@ export const TopNav: React.FC<TopNavProps> = ({
               <Button 
                 variant={isMoving ? "default" : "ghost"}
                 onClick={handleMoveClick}
-                className={`h-14 w-14 rounded-none p-0 flex items-center justify-center border-l border-border focus:outline-none ${isMoving ? 'bg-blue-500 hover:bg-blue-600 [&>svg]:text-white dark:[&>svg]:text-white' : ''}`}
+                className={`aspect-square h-14 w-14 flex-none rounded-none p-0 flex items-center justify-center border-l border-border focus:outline-none ${isMoving ? 'bg-blue-500 hover:bg-blue-600 [&>svg]:text-white dark:[&>svg]:text-white' : ''}`}
               >
                 <HandRaisedIcon className="!h-[24px] !w-[24px] min-h-[24px] min-w-[24px]" />
               </Button>
@@ -364,7 +364,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         </TooltipProvider>
       </div>
 
-      <div className="flex justify-end">
+      <div className="hidden sm:flex justify-end">
         <Button>
           Publish
         </Button>

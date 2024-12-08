@@ -21,7 +21,8 @@ export interface WorkspaceData {
     y: number;
     name: string;
     category: string;
-    createdAt: string;
+    timestamp: number;
+    sequence: number;
   }>;
   categories: Array<{
     id: string;
@@ -114,11 +115,12 @@ export async function exportWorkspace(
       },
       waypoints: waypoints.map(wp => ({
         ...wp,
-        createdAt: new Date().toISOString() // In future, this should come from waypoint creation time
+        timestamp: wp.timestamp || Date.now(),
+        sequence: wp.sequence || 0,
       })),
       categories: categories.map(cat => ({
         ...cat,
-        createdAt: new Date().toISOString() // In future, this should come from category creation time
+        createdAt: new Date().toISOString()
       })),
       statistics: {
         totalWaypoints: waypoints.length,
@@ -184,17 +186,22 @@ export async function importWorkspace(
     const imageBlob = await imageFile.async('blob');
     const imageUrl = URL.createObjectURL(imageBlob);
 
-    // Process waypoints (generate IDs for any new waypoints)
-    workspaceData.waypoints = workspaceData.waypoints.map(waypoint => ({
+    // Process waypoints (ensure all required fields exist)
+    workspaceData.waypoints = workspaceData.waypoints.map((waypoint, index) => ({
       ...waypoint,
-      id: waypoint.id?.match(/^[a-zA-Z0-9]+$/) 
+      id: waypoint.id?.match(/^[a-zA-Z0-9_]+$/) 
         ? waypoint.id 
-        : Math.random().toString(36).substr(2, 9),
+        : `wp_${Date.now()}_${index + 1}`,
       x: Math.max(0, Math.min(100, waypoint.x)),
       y: Math.max(0, Math.min(100, waypoint.y)),
       name: waypoint.name || 'Unnamed Waypoint',
-      category: waypoint.category || 'Default'
+      category: waypoint.category || 'Default',
+      timestamp: waypoint.timestamp || Date.now(),
+      sequence: waypoint.sequence || index + 1
     }));
+
+    // Sort waypoints by sequence
+    workspaceData.waypoints.sort((a, b) => a.sequence - b.sequence);
 
     return { workspaceData, imageUrl };
   } catch (error) {

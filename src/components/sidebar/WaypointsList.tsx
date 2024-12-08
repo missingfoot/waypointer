@@ -34,8 +34,14 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
   onWaypointDelete,
 }) => {
   const [filterText, setFilterText] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('time');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [sortBy, setSortBy] = useState<SortOption>(() => {
+    const saved = localStorage.getItem('waypoints-sort-by');
+    return (saved ? JSON.parse(saved) : 'time') as SortOption;
+  });
+  const [sortDirection, setSortDirection] = useState<SortDirection>(() => {
+    const saved = localStorage.getItem('waypoints-sort-direction');
+    return (saved ? JSON.parse(saved) : 'asc') as SortDirection;
+  });
   const [groupByCategory, setGroupByCategory] = useState<boolean>(() => {
     const saved = localStorage.getItem('waypoints-group-by-category');
     return saved ? JSON.parse(saved) : false;
@@ -48,10 +54,16 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
 
   const handleSortClick = (newSortBy: SortOption) => {
     if (sortBy === newSortBy) {
-      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+      setSortDirection(prev => {
+        const newDirection = prev === 'asc' ? 'desc' : 'asc';
+        localStorage.setItem('waypoints-sort-direction', JSON.stringify(newDirection));
+        return newDirection;
+      });
     } else {
       setSortBy(newSortBy);
       setSortDirection('asc');
+      localStorage.setItem('waypoints-sort-by', JSON.stringify(newSortBy));
+      localStorage.setItem('waypoints-sort-direction', JSON.stringify('asc'));
     }
   };
 
