@@ -8,6 +8,7 @@ import { useWaypointDialog } from '@/hooks/useWaypointDialog';
 import { showErrorToast } from '@/utils/toast';
 import { normalizedToScreen, normalizedToPercent } from '@/utils/coordinates';
 import { Waypoint, Category, Dimensions, Point } from '@/types';
+import type { MapContentHandle } from './map/MapContent';
 
 interface MapWorkspaceProps {
   onMapUpload: (file: File) => void;
@@ -20,6 +21,12 @@ interface MapWorkspaceProps {
   onCategoryAdd: (name: string, color: string) => void;
   isDebugMode: boolean;
   setIsDebugMode: React.Dispatch<React.SetStateAction<boolean>>;
+  waypointDialogState: {
+    open: boolean;
+    position: { x: number; y: number };
+    waypointId: string | null;
+  };
+  onWaypointClick: (waypointId: string, screenPosition: { x: number; y: number }) => void;
 }
 
 export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
@@ -33,8 +40,11 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   onCategoryAdd,
   isDebugMode,
   setIsDebugMode,
+  waypointDialogState,
+  onWaypointClick,
 }) => {
   const imageRef = useRef<HTMLImageElement>(null);
+  const mapContentRef = useRef<MapContentHandle>(null);
   const [imageDimensions, setImageDimensions] = useState<Dimensions | null>(null);
   const [transformState, setTransformState] = useState({ scale: 1, positionX: 0, positionY: 0 });
 
@@ -55,26 +65,41 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     dialogOpen,
     setDialogOpen,
     dialogPosition,
+    setDialogPosition,
     editingWaypoint,
+    setEditingWaypoint,
     pendingPoint,
-    handleWaypointClick,
-    handleCoordinateSelect,
+    handleCoordinateSelect: baseHandleCoordinateSelect,
     handleWaypointSubmit
   } = useWaypointDialog({
     onWaypointAdd: (point) => {
       onWaypointAdd(point);
       if (isDebugMode && imageDimensions && pendingPoint) {
         const screenPos = normalizedToScreen(pendingPoint, imageDimensions);
-        addWaypointToHistory(
-          screenPos,
-          { x: point.x, y: point.y },
-          transformState.scale
-        );
+        const percentPos = normalizedToPercent(pendingPoint);
+        addWaypointToHistory(screenPos, percentPos, transformState.scale);
       }
     },
     onWaypointEdit,
     waypoints
   });
+
+  const handleCoordinateSelect = useCallback((point: Point, screenPosition: Point) => {
+    if (isDebugMode && imageDimensions) {
+      const percentPos = normalizedToPercent(point);
+      addClickToHistory(screenPosition, percentPos, transformState.scale);
+    }
+    baseHandleCoordinateSelect(point, screenPosition);
+  }, [isDebugMode, imageDimensions, addClickToHistory, transformState.scale, baseHandleCoordinateSelect]);
+
+  // Update dialog state when waypointDialogState changes
+  useEffect(() => {
+    if (waypointDialogState.open) {
+      setDialogOpen(true);
+      setEditingWaypoint(waypointDialogState.waypointId);
+      setDialogPosition(waypointDialogState.position);
+    }
+  }, [waypointDialogState, setDialogOpen, setEditingWaypoint, setDialogPosition]);
 
   const handleImageLoad = (dimensions: Dimensions) => {
     setImageDimensions(dimensions);
@@ -110,44 +135,36 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     }
   };
 
-  // Add keyboard shortcut for debug mode
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'b' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        setIsDebugMode?.(!isDebugMode);
-      }
+  const handleWaypointEdit = (waypointId: string) => {
+    const waypoint = waypoints.find(w => w.id === waypointId);
+    if (!waypoint || !imageRef.current) return;
+
+    // Center the map on the waypoint
+    mapContentRef.current?.centerOnWaypoint(waypointId);
+
+    // Get the waypoint's screen position after centering
+    const rect = imageRef.current.getBoundingClientRect();
+    const screenPosition = {
+      x: rect.left + (waypoint.x / 100) * rect.width,
+      y: rect.top + (waypoint.y / 100) * rect.height
     };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isDebugMode, setIsDebugMode]);
+    onWaypointClick(waypointId, screenPosition);
+  };
 
   return (
-    <div 
-      className="relative w-full h-full"
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={handleDrop}
-      onMouseMove={handleMouseMove}
-    >
+    <div className="w-full h-full relative">
       {!mapUrl ? (
         <MapUploadInterface onMapUpload={onMapUpload} />
       ) : (
         <>
           <MapInteractionHandler
+            ref={mapContentRef}
             mapUrl={mapUrl}
             waypoints={waypoints}
             isAddingWaypoint={isAddingWaypoint}
-            onCoordinateSelect={(normalized, screenPosition) => {
-              if (isDebugMode) {
-                addClickToHistory(
-                  screenPosition,
-                  { x: normalized.x * 100, y: normalized.y * 100 },
-                  transformState.scale
-                );
-              }
-              handleCoordinateSelect(normalized, screenPosition);
-            }}
-            onWaypointClick={handleWaypointClick}
+            onCoordinateSelect={handleCoordinateSelect}
+            onWaypointClick={handleWaypointEdit}
             imageRef={imageRef}
             onImageLoad={handleImageLoad}
             categories={categories}
@@ -158,11 +175,11 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
               clickHistory={clickHistory}
               waypointHistory={waypointHistory}
               combinedHistory={[...clickHistory, ...waypointHistory].sort((a, b) => a.timestamp - b.timestamp)}
-              onReset={handleDebugReset}
               cursorPosition={cursorPosition}
               cursorPercent={cursorPercent}
-              position={position}
               scale={scale}
+              position={position}
+              onReset={handleDebugReset}
               imageDimensions={imageDimensions}
             />
           )}
@@ -175,6 +192,8 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
             position={dialogPosition}
             editMode={!!editingWaypoint}
             initialData={editingWaypoint ? waypoints.find(w => w.id === editingWaypoint) : undefined}
+            waypoint={editingWaypoint ? waypoints.find(w => w.id === editingWaypoint) : undefined}
+            imageRef={imageRef}
           />
         </>
       )}

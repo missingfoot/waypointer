@@ -9,22 +9,28 @@ import { SettingsTab } from './sidebar/SettingsTab';
 interface SidebarProps {
   waypoints: Waypoint[];
   categories: Category[];
+  onWaypointEdit: (id: string, updates: { name: string; category: string }) => void;
   onWaypointDelete: (id: string) => void;
   onCategoryAdd: (name: string, color: string) => void;
   onCategoryDelete: (id: string) => void;
-  onToggleAddWaypoint: () => void;
-  isAddingWaypoint: boolean;
-  mapUrl: string | null;
-  onMapUpload: (file: File) => void;
-  onMapDelete: () => void;
+  mapImage: { width: number; height: number } | null;
+  hasWaypoints: boolean;
+  onReplaceImage: (file: File) => void;
+  onDeleteImage: () => void;
   onClearWaypoints: () => void;
   onClearCategories: () => void;
+  onLoadExample: () => void;
+  onWaypointClick: (waypointId: string, screenPosition: { x: number; y: number }) => void;
 }
 
 interface Waypoint {
   id: string;
+  x: number;
+  y: number;
   name: string;
   category: string;
+  timestamp: number;
+  sequence: number;
 }
 
 interface Category {
@@ -36,33 +42,22 @@ interface Category {
 export const Sidebar: React.FC<SidebarProps> = ({
   waypoints,
   categories,
+  onWaypointEdit,
   onWaypointDelete,
   onCategoryAdd,
   onCategoryDelete,
-  onToggleAddWaypoint,
-  isAddingWaypoint,
-  mapUrl,
-  onMapUpload,
-  onMapDelete,
+  mapImage,
+  hasWaypoints,
+  onReplaceImage,
+  onDeleteImage,
   onClearWaypoints,
   onClearCategories,
+  onLoadExample,
+  onWaypointClick,
 }) => {
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
   const addButtonRef = useRef<HTMLButtonElement>(null);
-  const [mapDimensions, setMapDimensions] = useState<{ width: number; height: number } | null>(null);
-
-  React.useEffect(() => {
-    if (mapUrl) {
-      const img = new Image();
-      img.onload = () => {
-        setMapDimensions({ width: img.width, height: img.height });
-      };
-      img.src = mapUrl;
-    } else {
-      setMapDimensions(null);
-    }
-  }, [mapUrl]);
 
   const handleAddCategoryClick = () => {
     const buttonRect = addButtonRef.current?.getBoundingClientRect();
@@ -86,6 +81,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               waypoints={waypoints}
               categories={categories}
               onWaypointDelete={onWaypointDelete}
+              onWaypointEdit={onWaypointEdit}
+              onWaypointClick={onWaypointClick}
             />
           </TabsContent>
 
@@ -100,12 +97,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <TabsContent value="settings" className="mt-0 h-full relative">
             <SettingsTab
-              mapImage={mapDimensions}
-              hasWaypoints={waypoints.length > 0}
-              onReplaceImage={onMapUpload}
-              onDeleteImage={onMapDelete}
+              mapImage={mapImage}
+              hasWaypoints={hasWaypoints}
+              onReplaceImage={onReplaceImage}
+              onDeleteImage={onDeleteImage}
               onClearWaypoints={onClearWaypoints}
               onClearCategories={onClearCategories}
+              onLoadExample={onLoadExample}
             />
           </TabsContent>
         </div>

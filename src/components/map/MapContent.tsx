@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { MapControls } from './MapControls';
 
@@ -24,7 +24,11 @@ interface MapContentProps {
   onTransformChange?: (scale: number, x: number, y: number) => void;
 }
 
-export const MapContent: React.FC<MapContentProps> = ({
+export interface MapContentHandle {
+  centerOnWaypoint: (waypointId: string) => void;
+}
+
+export const MapContent = forwardRef<MapContentHandle, MapContentProps>(({
   mapUrl,
   waypoints,
   onWaypointClick,
@@ -32,13 +36,32 @@ export const MapContent: React.FC<MapContentProps> = ({
   onImageLoad,
   onZoomCallbacksChange,
   onTransformChange,
-}) => {
+}, ref) => {
   const internalImageRef = useRef<HTMLImageElement>(null);
   const imageRef = externalImageRef || internalImageRef;
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const hasCalledOnLoadRef = useRef(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [currentScale, setCurrentScale] = useState(1);
+  const transformRef = useRef<{ setTransform: (x: number, y: number, scale: number, duration?: number) => void }>();
+
+  useImperativeHandle(ref, () => ({
+    centerOnWaypoint: (waypointId: string) => {
+      if (!wrapperRef.current || !dimensions || !transformRef.current) return;
+
+      const waypoint = waypoints.find(w => w.id === waypointId);
+      if (!waypoint) return;
+
+      const wrapper = wrapperRef.current.getBoundingClientRect();
+      const scale = Math.min(2, currentScale);  // Don't zoom in too far
+      
+      // Calculate the position to center the waypoint
+      const x = wrapper.width / 2 - (waypoint.x * dimensions.width * scale);
+      const y = wrapper.height / 2 - (waypoint.y * dimensions.height * scale);
+
+      transformRef.current.setTransform(x, y, scale, 300);
+    }
+  }));
 
   useEffect(() => {
     const handleLoad = () => {
@@ -82,6 +105,9 @@ export const MapContent: React.FC<MapContentProps> = ({
       }}
     >
       {({ zoomIn, zoomOut, resetTransform, centerView, setTransform }) => {
+        // Store setTransform in ref for use in centerOnWaypoint
+        transformRef.current = { setTransform };
+
         const handleFitToView = () => {
           if (!wrapperRef.current || !imageRef.current || !dimensions) return;
 
@@ -177,4 +203,4 @@ export const MapContent: React.FC<MapContentProps> = ({
       }}
     </TransformWrapper>
   );
-};
+});

@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MapWorkspace } from '@/components/MapWorkspace';
 import { Sidebar } from '@/components/Sidebar';
 import { TopNav } from '@/components/TopNav';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { useTheme } from 'next-themes';
 import { useMapState } from '@/hooks/useMapState';
+import type { Waypoint } from '@/types';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
   const {
     mapUrl,
+    mapDimensions,
     projectName,
     waypoints,
     categories,
@@ -20,6 +22,24 @@ const Index = () => {
     setIsDebugMode,
     handlers
   } = useMapState();
+
+  const [waypointDialogState, setWaypointDialogState] = useState<{
+    open: boolean;
+    position: { x: number; y: number };
+    waypointId: string | null;
+  }>({
+    open: false,
+    position: { x: 0, y: 0 },
+    waypointId: null
+  });
+
+  const handleWaypointClick = (waypointId: string, screenPosition: { x: number; y: number }) => {
+    setWaypointDialogState({
+      open: true,
+      position: screenPosition,
+      waypointId
+    });
+  };
 
   return (
     <div className="h-screen flex flex-col">
@@ -46,6 +66,8 @@ const Index = () => {
                 onCategoryAdd={handlers.handleCategoryAdd}
                 isDebugMode={isDebugMode}
                 setIsDebugMode={setIsDebugMode}
+                waypointDialogState={waypointDialogState}
+                onWaypointClick={handleWaypointClick}
               />
             </ResizablePanel>
             <ResizableHandle className="relative h-0 -mb-2 z-30 bg-transparent hover:bg-transparent focus-visible:outline-none focus-visible:ring-0 after:hidden data-[panel-group-direction=vertical]:after:hidden">
@@ -60,18 +82,20 @@ const Index = () => {
               <div className="h-4" />
               <div className="absolute top-3 left-1/2 -translate-x-1/2 w-8 h-1 bg-[#dddddd] dark:bg-[#444444] rounded-full" />
               <Sidebar
+                mapImage={mapDimensions}
+                hasWaypoints={waypoints.length > 0}
+                onReplaceImage={handlers.handleMapUpload}
+                onDeleteImage={handlers.handleMapDelete}
+                onClearWaypoints={handlers.handleClearWaypoints}
+                onClearCategories={handlers.handleClearCategories}
+                onLoadExample={handlers.handleLoadExample}
                 waypoints={waypoints}
                 categories={categories}
+                onWaypointEdit={handlers.handleWaypointEdit}
                 onWaypointDelete={handlers.handleWaypointDelete}
                 onCategoryAdd={handlers.handleCategoryAdd}
                 onCategoryDelete={handlers.handleCategoryDelete}
-                onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
-                isAddingWaypoint={isAddingWaypoint}
-                mapUrl={mapUrl}
-                onMapUpload={handlers.handleMapUpload}
-                onMapDelete={handlers.handleMapDelete}
-                onClearWaypoints={handlers.handleClearWaypoints}
-                onClearCategories={handlers.handleClearCategories}
+                onWaypointClick={handleWaypointClick}
               />
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -93,18 +117,20 @@ const Index = () => {
               }}
             >
               <Sidebar
+                mapImage={mapDimensions}
+                hasWaypoints={waypoints.length > 0}
+                onReplaceImage={handlers.handleMapUpload}
+                onDeleteImage={handlers.handleMapDelete}
+                onClearWaypoints={handlers.handleClearWaypoints}
+                onClearCategories={handlers.handleClearCategories}
+                onLoadExample={handlers.handleLoadExample}
                 waypoints={waypoints}
                 categories={categories}
+                onWaypointEdit={handlers.handleWaypointEdit}
                 onWaypointDelete={handlers.handleWaypointDelete}
                 onCategoryAdd={handlers.handleCategoryAdd}
                 onCategoryDelete={handlers.handleCategoryDelete}
-                onToggleAddWaypoint={() => setIsAddingWaypoint(!isAddingWaypoint)}
-                isAddingWaypoint={isAddingWaypoint}
-                mapUrl={mapUrl}
-                onMapUpload={handlers.handleMapUpload}
-                onMapDelete={handlers.handleMapDelete}
-                onClearWaypoints={handlers.handleClearWaypoints}
-                onClearCategories={handlers.handleClearCategories}
+                onWaypointClick={handleWaypointClick}
               />
             </ResizablePanel>
             <ResizableHandle />
@@ -120,6 +146,8 @@ const Index = () => {
                 onCategoryAdd={handlers.handleCategoryAdd}
                 isDebugMode={isDebugMode}
                 setIsDebugMode={setIsDebugMode}
+                waypointDialogState={waypointDialogState}
+                onWaypointClick={handleWaypointClick}
               />
             </ResizablePanel>
           </ResizablePanelGroup>

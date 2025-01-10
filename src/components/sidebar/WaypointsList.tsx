@@ -23,6 +23,8 @@ interface WaypointsListProps {
   waypoints: Waypoint[];
   categories: Category[];
   onWaypointDelete: (id: string) => void;
+  onWaypointEdit: (id: string, updates: { name: string; category: string }) => void;
+  onWaypointClick: (waypointId: string, screenPosition: { x: number; y: number }) => void;
 }
 
 type SortOption = 'alphabetical' | 'time';
@@ -32,6 +34,8 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
   waypoints,
   categories,
   onWaypointDelete,
+  onWaypointEdit,
+  onWaypointClick,
 }) => {
   const [filterText, setFilterText] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>(() => {
@@ -106,6 +110,10 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
       }, [] as Array<{ category: string; color: string; waypoints: Waypoint[] }>)
     : null;
 
+  const handleWaypointEdit = (waypoint: { id: string; name: string; category: string; x: number; y: number }) => {
+    onWaypointClick(waypoint.id, { x: 0, y: 0 });
+  };
+
   if (waypoints.length === 0) {
     return (
       <div className="flex flex-col items-start pt-8 space-y-4 text-left">
@@ -163,6 +171,7 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
                     x={waypoint.x}
                     y={waypoint.y}
                     onDelete={onWaypointDelete}
+                    onEdit={handleWaypointEdit}
                     hideCategory={true}
                   />
                 ))}
@@ -179,6 +188,7 @@ export const WaypointsList: React.FC<WaypointsListProps> = ({
                 x={waypoint.x}
                 y={waypoint.y}
                 onDelete={onWaypointDelete}
+                onEdit={handleWaypointEdit}
                 hideCategory={false}
               />
             ))

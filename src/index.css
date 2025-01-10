@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -36,6 +36,13 @@
 
     --workspace-background: 210 40% 98%;  /* Original light theme color */
     --workspace-foreground: 222.2 47.4% 11.2%;
+
+    /* iOS viewport handling */
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
   .dark {
@@ -71,14 +78,36 @@
     --workspace-foreground: 0 0% 95%;  /* #f2f2f2 */
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
   }
+}
+
+#root {
+  height: 100%;
+}
+
+/* Prevent text selection */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection in inputs and textareas */
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /* Override ring offset globally */

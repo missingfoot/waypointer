@@ -16,6 +16,11 @@ interface WaypointDialogProps {
     name: string;
     category: string;
   };
+  waypoint?: {
+    x: number;
+    y: number;
+  };
+  imageRef?: React.RefObject<HTMLImageElement>;
 }
 
 export const WaypointDialog: React.FC<WaypointDialogProps> = ({
@@ -27,11 +32,43 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
   position,
   editMode = false,
   initialData,
+  waypoint,
+  imageRef,
 }) => {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
+  const [dialogPosition, setDialogPosition] = useState(position);
+
+  // Update position when waypoint coordinates or image transform changes
+  useEffect(() => {
+    if (open && waypoint && imageRef?.current) {
+      const updatePosition = () => {
+        const rect = imageRef.current?.getBoundingClientRect();
+        if (rect) {
+          setDialogPosition({
+            x: rect.left + (waypoint.x / 100) * rect.width,
+            y: rect.top + (waypoint.y / 100) * rect.height
+          });
+        }
+      };
+
+      // Update position immediately
+      updatePosition();
+
+      // Update position on scroll or resize
+      window.addEventListener('scroll', updatePosition);
+      window.addEventListener('resize', updatePosition);
+
+      return () => {
+        window.removeEventListener('scroll', updatePosition);
+        window.removeEventListener('resize', updatePosition);
+      };
+    } else {
+      setDialogPosition(position);
+    }
+  }, [open, waypoint, imageRef, position]);
 
   useEffect(() => {
     if (open) {
@@ -79,8 +116,8 @@ export const WaypointDialog: React.FC<WaypointDialogProps> = ({
     <div 
       className="fixed w-64 bg-background border rounded-lg shadow-lg z-50"
       style={{ 
-        left: `${position.x}px`, 
-        top: `${position.y}px`
+        left: `${dialogPosition.x}px`, 
+        top: `${dialogPosition.y}px`
       }}
       onKeyDown={handleKeyDown}
     >

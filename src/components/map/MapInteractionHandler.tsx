@@ -1,5 +1,5 @@
-import React, { useRef, useCallback, useState, useEffect } from 'react';
-import { MapContent } from './MapContent';
+import React, { useRef, useCallback, useState, useEffect, forwardRef } from 'react';
+import { MapContent, MapContentHandle } from './MapContent';
 
 interface MapInteractionHandlerProps {
   mapUrl: string;
@@ -9,6 +9,7 @@ interface MapInteractionHandlerProps {
     y: number;
     name: string;
     category: string;
+    categoryColor?: string;
   }>;
   isAddingWaypoint: boolean;
   onCoordinateSelect: (normalized: { x: number; y: number }, screenPosition: { x: number; y: number }) => void;
@@ -19,7 +20,7 @@ interface MapInteractionHandlerProps {
   onTransformChange?: (scale: number, x: number, y: number) => void;
 }
 
-export const MapInteractionHandler: React.FC<MapInteractionHandlerProps> = ({
+export const MapInteractionHandler = forwardRef<MapContentHandle, MapInteractionHandlerProps>(({
   mapUrl,
   waypoints,
   isAddingWaypoint,
@@ -29,7 +30,7 @@ export const MapInteractionHandler: React.FC<MapInteractionHandlerProps> = ({
   onImageLoad,
   categories,
   onTransformChange,
-}) => {
+}, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isHolding, setIsHolding] = useState(false);
@@ -158,6 +159,7 @@ export const MapInteractionHandler: React.FC<MapInteractionHandlerProps> = ({
       onMouseLeave={handleMouseLeave}
     >
       <MapContent
+        ref={ref}
         mapUrl={mapUrl}
         waypoints={waypoints.map(wp => {
           const category = categories?.find(cat => cat.name === wp.category);
@@ -188,4 +190,4 @@ export const MapInteractionHandler: React.FC<MapInteractionHandlerProps> = ({
       />
     </div>
   );
-}; 
+}); 

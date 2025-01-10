@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Waypoint, Category } from '../types';
+import { Waypoint, Category, Dimensions } from '../types';
 import { createNewCategory, isCategoryNameTaken } from '../utils/categoryUtils';
 import { showSuccessToast, showErrorToast } from '../utils/toast';
+import { importWorkspace } from '../lib/workspace-utils';
 
 export function useMapState() {
   const [mapUrl, setMapUrl] = useState<string | null>(null);
+  const [mapDimensions, setMapDimensions] = useState<Dimensions | null>(null);
   const [projectName, setProjectName] = useState("My Project");
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -14,12 +16,21 @@ export function useMapState() {
 
   const handleMapUpload = (file: File) => {
     const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      setMapDimensions({
+        width: img.naturalWidth,
+        height: img.naturalHeight
+      });
+    };
+    img.src = url;
     setMapUrl(url);
     showSuccessToast('Map uploaded successfully');
   };
 
   const handleMapDelete = () => {
     setMapUrl(null);
+    setMapDimensions(null);
     showSuccessToast('Map deleted successfully');
   };
 
@@ -114,8 +125,39 @@ export function useMapState() {
     setCategories(importedCategories);
   };
 
+  const handleLoadExample = async () => {
+    try {
+      const response = await fetch('/example-project.zip');
+      const blob = await response.blob();
+      const file = new File([blob], 'example-project.zip', { type: 'application/zip' });
+      
+      const { workspaceData, imageUrl } = await importWorkspace(file);
+      
+      const img = new Image();
+      img.onload = () => {
+        setMapDimensions({
+          width: img.naturalWidth,
+          height: img.naturalHeight
+        });
+      };
+      img.src = imageUrl;
+      
+      setMapUrl(imageUrl);
+      setWaypoints(workspaceData.waypoints);
+      setCategories(workspaceData.categories);
+      setWaypointCounter(Math.max(...workspaceData.waypoints.map(w => w.sequence || 0), 0));
+      setProjectName(workspaceData.metadata.projectName);
+      
+      showSuccessToast('Example project loaded successfully');
+    } catch (error) {
+      console.error('Failed to load example project:', error);
+      showErrorToast('Failed to load example project');
+    }
+  };
+
   return {
     mapUrl,
+    mapDimensions,
     projectName,
     waypoints: waypoints.sort((a, b) => a.sequence - b.sequence),
     categories,
@@ -134,7 +176,8 @@ export function useMapState() {
       handleWaypointEdit,
       handleCategoryAdd,
       handleCategoryDelete,
-      handleImportWorkspace
+      handleImportWorkspace,
+      handleLoadExample
     }
   };
 } 

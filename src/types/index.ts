@@ -9,8 +9,8 @@ export interface Waypoint {
   y: number;  // percentage (0-100)
   name: string;
   category: string;
-  timestamp?: number;  // when the waypoint was created
-  sequence?: number;   // order in which waypoints were added
+  timestamp: number;  // when the waypoint was created
+  sequence: number;   // order in which waypoints were added
 }
 
 export interface Category {

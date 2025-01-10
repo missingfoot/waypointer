@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ImagePlus } from 'lucide-react';
+import { ImagePlus, FileDown } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +20,7 @@ interface SettingsTabProps {
   onDeleteImage: () => void;
   onClearWaypoints: () => void;
   onClearCategories: () => void;
+  onLoadExample: () => void;
 }
 
 export const SettingsTab: React.FC<SettingsTabProps> = ({
@@ -29,6 +30,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   onDeleteImage,
   onClearWaypoints,
   onClearCategories,
+  onLoadExample,
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -145,6 +147,33 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
           <h2 className="text-lg font-semibold">Data Management</h2>
           <div className="space-y-6">
             <div className="space-y-4">
+              <div className="space-y-1">
+                <div className="text-sm font-medium">Load Example Project</div>
+                <div className="text-sm text-muted-foreground">Load a pre-configured example project</div>
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <FileDown className="w-4 h-4 mr-2" />
+                    Load Example
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Load Example Project</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will replace your current map, waypoints, and categories with the example project. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onLoadExample}>Load Example</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+
+            <div className="space-y-4 pt-4 border-t">
               <div className="space-y-1">
                 <div className="text-sm font-medium">Clear All Waypoints</div>
                 <div className="text-sm text-muted-foreground">Delete all waypoints from the map</div>

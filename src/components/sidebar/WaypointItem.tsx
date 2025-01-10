@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Edit, Trash2 } from 'lucide-react';
 
 interface WaypointItemProps {
   id: string;
@@ -9,6 +10,7 @@ interface WaypointItemProps {
   x: number;
   y: number;
   onDelete: (id: string) => void;
+  onEdit: (waypoint: { id: string; name: string; category: string; x: number; y: number }) => void;
   hideCategory?: boolean;
 }
 
@@ -17,7 +19,10 @@ export const WaypointItem: React.FC<WaypointItemProps> = ({
   name,
   category,
   categoryColor,
+  x,
+  y,
   onDelete,
+  onEdit,
   hideCategory = false,
 }) => {
   return (
@@ -32,13 +37,22 @@ export const WaypointItem: React.FC<WaypointItemProps> = ({
           <p className="text-sm text-muted-foreground">{category}</p>
         )}
       </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => onDelete(id)}
-      >
-        Delete
-      </Button>
+      <div className="flex gap-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onEdit({ id, name, category, x, y })}
+        >
+          <Edit className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onDelete(id)}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 };
